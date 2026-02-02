@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المنتجات | AuraPrice</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="products.css">
+    <link rel="stylesheet" href="products-modal.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>
+                    <span class="logo-icon">✦</span>
+                    AuraPrice
+                </h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>لوحة التحكم</span>
+                </a>
+                <a href="products.html" class="nav-item active">
+                    <span class="nav-icon">💍</span>
+                    <span>إدارة المنتجات</span>
+                </a>
+                <a href="pricing.html" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>إعدادات التسعير</span>
+                </a>
+                <a href="salla-integration.html" class="nav-item">
+                    <span class="nav-icon">🔗</span>
+                    <span>ربط منصة سلة</span>
+                </a>
+                <a href="automation.html" class="nav-item">
+                    <span class="nav-icon">⚡</span>
+                    <span>التحديث التلقائي</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>التقارير</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>الإعدادات</span>
+                </a>
+                <a href="index.html" class="nav-item" style="margin-top: 2rem; color: #EF4444;">
+                    <span class="nav-icon">🚪</span>
+                    <span>تسجيل الخروج</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <h1>إدارة المنتجات 💍</h1>
+                    <p>عرض وتحرير جميع منتجات الذهب والمجوهرات</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-sync">
+                        <span>🔄</span>
+                        مزامنة مع سلة
+                    </button>
+                    <button class="btn-add-product">
+                        <span>+</span>
+                        إضافة منتج
+                    </button>
+                </div>
+            </header>
+
+            <!-- Products Stats -->
+            <section class="products-stats-section">
+                <div class="products-stat-card complete">
+                    <div class="stat-icon">✓</div>
+                    <div class="stat-content">
+                        <span class="stat-label">منتجات مكتملة</span>
+                        <span class="stat-number">1,066</span>
+                    </div>
+                    <span class="stat-percentage">85.4%</span>
+                </div>
+
+                <div class="products-stat-card incomplete">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <span class="stat-label">منتجات غير مكتملة</span>
+                        <span class="stat-number">182</span>
+                    </div>
+                    <span class="stat-percentage">14.6%</span>
+                </div>
+
+                <div class="products-stat-card total">
+                    <div class="stat-icon">💍</div>
+                    <div class="stat-content">
+                        <span class="stat-label">إجمالي المنتجات</span>
+                        <span class="stat-number">1,248</span>
+                    </div>
+                    <span class="stat-percentage">100%</span>
+                </div>
+            </section>
+
+            <!-- Filters & Search -->
+            <section class="filters-section">
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="ابحث عن منتج... (اسم، SKU، الفئة)">
+                </div>
+
+                <div class="filters-group">
+                    <select class="filter-select">
+                        <option value="">جميع الفئات</option>
+                        <option value="rings">خواتم</option>
+                        <option value="necklaces">عقود</option>
+                        <option value="bracelets">أساور</option>
+                        <option value="earrings">أقراط</option>
+                    </select>
+
+                    <select class="filter-select">
+                        <option value="">نوع الذهب</option>
+                        <option value="24k">عيار 24</option>
+                        <option value="21k">عيار 21</option>
+                        <option value="18k">عيار 18</option>
+                        <option value="14k">عيار 14</option>
+                    </select>
+
+                    <select class="filter-select">
+                        <option value="">حالة التحديث</option>
+                        <option value="updated">محدث</option>
+                        <option value="pending">بانتظار التحديث</option>
+                        <option value="error">خطأ في التحديث</option>
+                    </select>
+
+                    <button class="btn-filter-reset">
+                        مسح الفلاتر
+                    </button>
+                </div>
+            </section>
+
+            <!-- Products Table -->
+            <section class="products-table-section">
+                <div class="table-header">
+                    <div class="table-info">
+                        <span class="products-count">عرض <strong>1-30</strong> من <strong>1,248</strong> منتج</span>
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn-table-action">
+                            <span>📥</span>
+                            استيراد
+                        </button>
+                        <button class="btn-table-action">
+                            <span>📤</span>
+                            تصدير
+                        </button>
+                        <button class="btn-table-action primary">
+                            <span>⚡</span>
+                            تحديث المحدد
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>صورة</th>
+                                <th>اسم المنتج</th>
+                                <th>SKU</th>
+                                <th>الفئة</th>
+                                <th>العيار</th>
+                                <th>الوزن (جرام)</th>
+                                <th>سعر الذهب</th>
+                                <th>السعر النهائي</th>
+                                <th>المتغيرات</th>
+                                <th>آخر تحديث</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="product-image">
+                                        <div class="product-image-placeholder">💍</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="product-name">
+                                        <strong>خاتم ذهب كلاسيكي</strong>
+                                        <span class="product-subtitle">تصميم أنيق وعصري</span>
+                                    </div>
+                                </td>
+                                <td><span class="sku">GR-2401</span></td>
+                                <td><span class="category">خواتم</span></td>
+                                <td><span class="carat gold-21">21</span></td>
+                                <td><span class="weight">5.2</span></td>
+                                <td><span class="gold-price">1,761 ر.س</span></td>
+                                <td><span class="final-price">2,113 ر.س</span></td>
+                                <td>
+                                    <button class="btn-variants" onclick="window.location.href='edit-product.html#variants'">
+                                        <span class="variants-count">2</span>
+                                        متغيرات
+                                    </button>
+                                </td>
+                                <td><span class="last-update">منذ 5 دقائق</span></td>
+                                <td><span class="status-badge success">محدث</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-action" title="تحرير" onclick="openEditModal(false)">✏️</button>
+                                        <button class="btn-action" title="تحديث السعر">⚡</button>
+                                        <button class="btn-action danger" title="حذف">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="product-image">
+                                        <div class="product-image-placeholder">📿</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="product-name">
+                                        <strong>عقد ذهب فاخر</strong>
+                                        <span class="product-subtitle">مرصع بالأحجار الكريمة</span>
+                                    </div>
+                                </td>
+                                <td><span class="sku">GN-2402</span></td>
+                                <td><span class="category">عقود</span></td>
+                                <td><span class="carat gold-18">18</span></td>
+                                <td><span class="weight">12.8</span></td>
+                                <td><span class="gold-price">3,251 ر.س</span></td>
+                                <td><span class="final-price">4,051 ر.س</span></td>
+                                <td>
+                                    <button class="btn-variants" onclick="window.location.href='edit-product.html#variants'">
+                                        <span class="variants-count">3</span>
+                                        متغيرات
+                                    </button>
+                                </td>
+                                <td><span class="last-update">منذ 5 دقائق</span></td>
+                                <td><span class="status-badge success">محدث</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-action" title="تحرير" onclick="openEditModal(false)">✏️</button>
+                                        <button class="btn-action" title="تحديث السعر">⚡</button>
+                                        <button class="btn-action danger" title="حذف">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="product-image">
+                                        <div class="product-image-placeholder">⭕</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="product-name">
+                                        <strong>أسورة ذهب للنساء</strong>
+                                        <span class="product-subtitle">تصميم حديث</span>
+                                    </div>
+                                </td>
+                                <td><span class="sku">GB-2403</span></td>
+                                <td><span class="category">أساور</span></td>
+                                <td><span class="carat gold-21">21</span></td>
+                                <td><span class="weight">8.5</span></td>
+                                <td><span class="gold-price">2,878 ر.س</span></td>
+                                <td><span class="final-price">3,454 ر.س</span></td>
+                                <td><span class="no-variants">-</span></td>
+                                <td><span class="last-update">منذ ساعة</span></td>
+                                <td><span class="status-badge warning">بانتظار</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-action" title="تحرير" onclick="openEditModal(false)">✏️</button>
+                                        <button class="btn-action" title="تحديث السعر">⚡</button>
+                                        <button class="btn-action danger" title="حذف">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="product-image">
+                                        <div class="product-image-placeholder">💫</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="product-name">
+                                        <strong>أقراط ذهب لامعة</strong>
+                                        <span class="product-subtitle">مناسبة للمناسبات</span>
+                                    </div>
+                                </td>
+                                <td><span class="sku">GE-2404</span></td>
+                                <td><span class="category">أقراط</span></td>
+                                <td><span class="carat gold-18">18</span></td>
+                                <td><span class="weight">3.2</span></td>
+                                <td><span class="gold-price">813 ر.س</span></td>
+                                <td><span class="final-price">976 ر.س</span></td>
+                                <td><span class="no-variants">-</span></td>
+                                <td><span class="last-update">أمس</span></td>
+                                <td><span class="status-badge error">خطأ</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-action" title="تحرير" onclick="openEditModal(false)">✏️</button>
+                                        <button class="btn-action" title="تحديث السعر">⚡</button>
+                                        <button class="btn-action danger" title="حذف">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                    <div class="product-image">
+                                        <div class="product-image-placeholder">💎</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="product-name">
+                                        <strong>طقم ذهب كامل</strong>
+                                        <span class="product-subtitle">عقد + أقراط + خاتم</span>
+                                    </div>
+                                </td>
+                                <td><span class="sku">GS-2405</span></td>
+                                <td><span class="category">أطقم</span></td>
+                                <td><span class="carat gold-21">21</span></td>
+                                <td><span class="weight">25.6</span></td>
+                                <td><span class="gold-price">8,666 ر.س</span></td>
+                                <td><span class="final-price">10,399 ر.س</span></td>
+                                <td>
+                                    <button class="btn-variants" onclick="window.location.href='edit-product.html#variants'">
+                                        <span class="variants-count">5</span>
+                                        متغيرات
+                                    </button>
+                                </td>
+                                <td><span class="last-update">منذ 5 دقائق</span></td>
+                                <td><span class="status-badge success">محدث</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-action" title="تحرير" onclick="openEditModal(false)">✏️</button>
+                                        <button class="btn-action" title="تحديث السعر">⚡</button>
+                                        <button class="btn-action danger" title="حذف">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button class="pagination-btn" disabled>السابق</button>
+                    <div class="pagination-numbers">
+                        <button class="pagination-number active">1</button>
+                        <button class="pagination-number">2</button>
+                        <button class="pagination-number">3</button>
+                        <span class="pagination-dots">...</span>
+                        <button class="pagination-number">62</button>
+                    </div>
+                    <button class="pagination-btn">التالي</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>تعديل المنتج: خاتم ذهب كلاسيكي</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Product Information -->
+                <div class="modal-section">
+                    <h3>📦 معلومات المنتج</h3>
+                    <div class="modal-form-grid">
+                        <div class="modal-form-group">
+                            <label>النوع</label>
+                            <select id="modalProductType">
+                                <option value="gold">ذهب</option>
+                                <option value="silver">فضة</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label>العيار</label>
+                            <select id="modalCarat">
+                                <option value="24">24</option>
+                                <option value="22">22</option>
+                                <option value="21" selected>21</option>
+                                <option value="18">18</option>
+                                <option value="14">14</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label>المصنعية</label>
+                            <input type="number" id="modalCraftsmanship" value="50" step="0.01">
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label>الوزن (جرام)</label>
+                            <input type="number" id="modalWeight" value="5.2" step="0.01">
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label>السعر الإضافي</label>
+                            <input type="number" id="modalAdditionalPrice" value="700" step="0.01">
+                        </div>
+
+                        <div class="modal-form-group">
+                            <label>الزيادة الإضافية (%)</label>
+                            <input type="number" id="modalProfitMargin" value="7" step="0.1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Calculation -->
+                <div class="modal-section">
+                    <h3>💰 حساب السعر</h3>
+                    <div class="modal-price-box">
+                        <div class="modal-price-row">
+                            <span>سعر الذهب (عيار 21):</span>
+                            <span class="modal-price-value">328.30 ر.س/جم</span>
+                        </div>
+                        <div class="modal-price-row">
+                            <span>الوزن:</span>
+                            <span class="modal-price-value">5.2 جم</span>
+                        </div>
+                        <div class="modal-price-row">
+                            <span>سعر الذهب الإجمالي:</span>
+                            <span class="modal-price-value">1,707.16 ر.س</span>
+                        </div>
+                        <div class="modal-price-row">
+                            <span>المصنعية:</span>
+                            <span class="modal-price-value">50 ر.س</span>
+                        </div>
+                        <div class="modal-price-row">
+                            <span>السعر الإضافي:</span>
+                            <span class="modal-price-value">700 ر.س</span>
+                        </div>
+                        <div class="modal-price-row highlight">
+                            <span>المكسب (7%):</span>
+                            <span class="modal-price-value profit">+172.00 ر.س</span>
+                        </div>
+                        <div class="modal-price-row total">
+                            <span>السعر النهائي:</span>
+                            <span class="modal-price-value">2,629.16 ر.س</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Variants Section (Hidden by default for products without variants) -->
+                <div class="modal-section" id="variantsSection" style="display: none;">
+                    <h3>🔀 متغيرات المنتج</h3>
+                    <div class="modal-variants-list">
+                        <div class="modal-variant-item">
+                            <span>متغير #1 - الوزن: 4.5 جم</span>
+                            <span class="variant-price">2,450 ر.س</span>
+                        </div>
+                        <div class="modal-variant-item">
+                            <span>متغير #2 - الوزن: 6.0 جم</span>
+                            <span class="variant-price">2,800 ر.س</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="modal-btn-cancel" onclick="closeEditModal()">إلغاء</button>
+                <button class="modal-btn-save" onclick="saveProduct()">حفظ التعديلات</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="products-modal.js"></script>
+</body>
+</html>

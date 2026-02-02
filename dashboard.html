@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | AuraPrice</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>
+                    <span class="logo-icon">✦</span>
+                    AuraPrice
+                </h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>لوحة التحكم</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <span class="nav-icon">💍</span>
+                    <span>إدارة المنتجات</span>
+                </a>
+                <a href="pricing.html" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>إعدادات التسعير</span>
+                </a>
+                <a href="salla-integration.html" class="nav-item">
+                    <span class="nav-icon">🔗</span>
+                    <span>ربط منصة سلة</span>
+                </a>
+                <a href="automation.html" class="nav-item">
+                    <span class="nav-icon">⚡</span>
+                    <span>التحديث التلقائي</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>التقارير</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>الإعدادات</span>
+                </a>
+                <a href="index.html" class="nav-item" style="margin-top: 2rem; color: #EF4444;">
+                    <span class="nav-icon">🚪</span>
+                    <span>تسجيل الخروج</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <h1>مرحبًا بك، أسامة 👋</h1>
+                    <p>إليك نظرة عامة على نشاط متجرك اليوم</p>
+                </div>
+                <div class="header-actions">
+                    <div class="gold-prices-ticker">
+                        <div class="price-ticker-item">
+                            <span class="ticker-label">عيار 24</span>
+                            <span class="ticker-price">375.20</span>
+                        </div>
+                        <div class="price-ticker-item">
+                            <span class="ticker-label">عيار 22</span>
+                            <span class="ticker-price">343.93</span>
+                        </div>
+                        <div class="price-ticker-item main">
+                            <span class="ticker-label">عيار 21</span>
+                            <span class="ticker-price">328.30</span>
+                            <span class="price-change">↑ 2.3%</span>
+                        </div>
+                        <div class="price-ticker-item">
+                            <span class="ticker-label">عيار 18</span>
+                            <span class="ticker-price">281.40</span>
+                        </div>
+                        <div class="price-ticker-item">
+                            <span class="ticker-label">عيار 14</span>
+                            <span class="ticker-price">218.87</span>
+                        </div>
+                        <div class="price-ticker-item silver">
+                            <span class="ticker-label">الفضة</span>
+                            <span class="ticker-price">3.85</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">إجمالي المنتجات</span>
+                        <div class="stat-icon gold">💍</div>
+                    </div>
+                    <div class="stat-value">1,248</div>
+                    <div class="stat-footer">
+                        <span class="stat-badge success">+12%</span>
+                        <span>مقارنة بالشهر الماضي</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">المنتجات المحدثة اليوم</span>
+                        <div class="stat-icon blue">✓</div>
+                    </div>
+                    <div class="stat-value">856</div>
+                    <div class="stat-footer">
+                        <span class="stat-badge success">68.6%</span>
+                        <span>من إجمالي المنتجات</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">التحديثات التلقائية</span>
+                        <div class="stat-icon green">⚡</div>
+                    </div>
+                    <div class="stat-value">15</div>
+                    <div class="stat-footer">
+                        <span class="stat-badge success">نشط</span>
+                        <span>آخر تحديث: منذ 5 دقائق</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">متوسط هامش الربح</span>
+                        <div class="stat-icon gold">📊</div>
+                    </div>
+                    <div class="stat-value">23.5%</div>
+                    <div class="stat-footer">
+                        <span class="stat-badge warning">-1.2%</span>
+                        <span>بسبب ارتفاع الأسعار</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions & Recent Activity -->
+            <div class="content-grid">
+                <!-- Quick Actions -->
+                <section class="quick-actions-card">
+                    <h3 class="section-title">إجراءات سريعة</h3>
+                    <div class="actions-grid">
+                        <button class="action-btn gold">
+                            <span class="action-icon">⚡</span>
+                            <div class="action-content">
+                                <h4>تحديث الأسعار الآن</h4>
+                                <p>تحديث جميع المنتجات بسعر الذهب الحالي</p>
+                            </div>
+                        </button>
+
+                        <button class="action-btn blue">
+                            <span class="action-icon">🔄</span>
+                            <div class="action-content">
+                                <h4>مزامنة مع سلة</h4>
+                                <p>سحب المنتجات الجديدة من متجرك</p>
+                            </div>
+                        </button>
+
+                        <button class="action-btn green">
+                            <span class="action-icon">📥</span>
+                            <div class="action-content">
+                                <h4>استيراد منتجات</h4>
+                                <p>رفع ملف Excel أو CSV</p>
+                            </div>
+                        </button>
+
+                        <button class="action-btn purple">
+                            <span class="action-icon">📊</span>
+                            <div class="action-content">
+                                <h4>تصدير تقرير</h4>
+                                <p>تحميل تقرير شامل بالأسعار</p>
+                            </div>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Price History Chart -->
+                <section class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="section-title">تاريخ أسعار الذهب</h3>
+                        <div class="chart-tabs">
+                            <button class="chart-tab active">اليوم</button>
+                            <button class="chart-tab">أسبوع</button>
+                            <button class="chart-tab">شهر</button>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div class="chart-line">
+                            <svg viewBox="0 0 400 150" width="100%" height="150">
+                                <path d="M 0 100 L 50 90 L 100 85 L 150 75 L 200 80 L 250 70 L 300 65 L 350 60 L 400 55"
+                                      stroke="url(#chartGradient)" stroke-width="3" fill="none"/>
+                                <defs>
+                                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#FFB800;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#FFC837;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <div class="chart-stats">
+                            <div class="chart-stat">
+                                <span class="chart-stat-label">الحد الأدنى</span>
+                                <span class="chart-stat-value">332.50 ر.س</span>
+                            </div>
+                            <div class="chart-stat">
+                                <span class="chart-stat-label">الحد الأقصى</span>
+                                <span class="chart-stat-value">341.20 ر.س</span>
+                            </div>
+                            <div class="chart-stat">
+                                <span class="chart-stat-label">المتوسط</span>
+                                <span class="chart-stat-value">336.85 ر.س</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Recent Updates -->
+            <section class="recent-updates-card">
+                <h3 class="section-title">آخر التحديثات</h3>
+                <div class="updates-list">
+                    <div class="update-item">
+                        <div class="update-icon success">✓</div>
+                        <div class="update-content">
+                            <h4>تحديث تلقائي للأسعار</h4>
+                            <p>تم تحديث 856 منتج بنجاح</p>
+                        </div>
+                        <span class="update-time">منذ 5 دقائق</span>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-icon info">🔄</div>
+                        <div class="update-content">
+                            <h4>مزامنة مع منصة سلة</h4>
+                            <p>تم سحب 23 منتج جديد</p>
+                        </div>
+                        <span class="update-time">منذ 15 دقيقة</span>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-icon warning">⚠️</div>
+                        <div class="update-content">
+                            <h4>تنبيه: ارتفاع سعر الذهب</h4>
+                            <p>سعر الذهب ارتفع بنسبة 2.3% - قد تحتاج لمراجعة هوامش الربح</p>
+                        </div>
+                        <span class="update-time">منذ 30 دقيقة</span>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-icon success">📊</div>
+                        <div class="update-content">
+                            <h4>تقرير شهري جاهز</h4>
+                            <p>تقرير يناير 2026 متاح للتحميل</p>
+                        </div>
+                        <span class="update-time">منذ ساعة</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

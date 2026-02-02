@@ -1,0 +1,291 @@
+/* Edit Product Modal Styles */
+
+/* Modal Overlay */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 26, 46, 0.85);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin: 0;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--bg-light);
+    border-radius: 8px;
+    color: var(--text-gray);
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-section {
+    margin-bottom: 1.5rem;
+}
+
+.modal-section:last-child {
+    margin-bottom: 0;
+}
+
+.modal-section h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* Modal Form */
+.modal-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.modal-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.modal-form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.modal-form-group input,
+.modal-form-group select {
+    padding: 0.625rem 0.875rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg-light);
+    transition: all 0.3s ease;
+}
+
+.modal-form-group input:focus,
+.modal-form-group select:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    background: white;
+}
+
+/* Modal Price Box */
+.modal-price-box {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.modal-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+
+.modal-price-row:last-child {
+    border-bottom: none;
+}
+
+.modal-price-row.highlight {
+    background: rgba(16, 185, 129, 0.08);
+    padding: 0.625rem 0.75rem;
+    border-radius: 6px;
+    margin: 0.375rem 0;
+    border: none;
+}
+
+.modal-price-row.total {
+    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-light) 100%);
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    color: white;
+}
+
+.modal-price-value {
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.modal-price-value.profit {
+    color: var(--success);
+    font-size: 0.95rem;
+}
+
+.modal-price-row.total .modal-price-value {
+    color: white;
+    font-size: 1.05rem;
+}
+
+/* Modal Variants */
+.modal-variants-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.modal-variant-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem;
+    background: var(--bg-light);
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.variant-price {
+    font-weight: 700;
+    color: var(--accent-gold);
+    font-size: 0.95rem;
+}
+
+/* Modal Footer */
+.modal-footer {
+    display: flex;
+    gap: 0.875rem;
+    padding: 1.25rem 1.5rem;
+    border-top: 2px solid var(--border-color);
+    justify-content: flex-end;
+}
+
+.modal-btn-cancel,
+.modal-btn-save {
+    padding: 0.75rem 1.75rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-btn-cancel {
+    background: white;
+    border: 2px solid var(--border-color);
+    color: var(--text-dark);
+}
+
+.modal-btn-cancel:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.modal-btn-save {
+    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-light) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 184, 0, 0.3);
+}
+
+.modal-btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 184, 0, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-content {
+        max-height: 95vh;
+        margin: 0.5rem;
+    }
+
+    .modal-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-btn-cancel,
+    .modal-btn-save {
+        width: 100%;
+    }
+}

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ربط منصة سلة | AuraPrice</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="integration.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>
+                    <span class="logo-icon">✦</span>
+                    AuraPrice
+                </h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>لوحة التحكم</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <span class="nav-icon">💍</span>
+                    <span>إدارة المنتجات</span>
+                </a>
+                <a href="pricing.html" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>إعدادات التسعير</span>
+                </a>
+                <a href="salla-integration.html" class="nav-item active">
+                    <span class="nav-icon">🔗</span>
+                    <span>ربط منصة سلة</span>
+                </a>
+                <a href="automation.html" class="nav-item">
+                    <span class="nav-icon">⚡</span>
+                    <span>التحديث التلقائي</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>التقارير</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>الإعدادات</span>
+                </a>
+                <a href="index.html" class="nav-item" style="margin-top: 2rem; color: #EF4444;">
+                    <span class="nav-icon">🚪</span>
+                    <span>تسجيل الخروج</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <h1>ربط منصة سلة 🔗</h1>
+                    <p>قم بربط متجرك على سلة لمزامنة المنتجات تلقائيًا</p>
+                </div>
+            </header>
+
+            <!-- Connection Status Card -->
+            <section class="connection-status-card">
+                <div class="status-icon connected">
+                    <span class="pulse-dot"></span>
+                    ✓
+                </div>
+                <div class="status-content">
+                    <h3>متصل بنجاح</h3>
+                    <p>متجرك مربوط بنجاح مع منصة سلة</p>
+                    <div class="status-meta">
+                        <span>آخر مزامنة: <strong>منذ 5 دقائق</strong></span>
+                        <span>المنتجات المزامنة: <strong>1,248</strong></span>
+                    </div>
+                </div>
+                <button class="btn-disconnect">
+                    قطع الاتصال
+                </button>
+            </section>
+
+            <div class="integration-grid">
+                <!-- API Settings Card -->
+                <section class="settings-card">
+                    <div class="card-header">
+                        <h3>🔑 إعدادات API</h3>
+                        <button class="btn-edit">تعديل</button>
+                    </div>
+
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>رابط المتجر</label>
+                            <input type="text" value="https://mystore.sa" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>API Token</label>
+                            <div class="token-field">
+                                <input type="password" value="sk_live_1234567890abcdefghij" readonly>
+                                <button class="btn-show-token">👁️</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Merchant ID</label>
+                            <input type="text" value="123456789" readonly>
+                        </div>
+
+                        <div class="info-box">
+                            <span class="info-icon">ℹ️</span>
+                            <div>
+                                <strong>كيفية الحصول على API Token:</strong>
+                                <p>1. سجل دخول إلى لوحة تحكم سلة</p>
+                                <p>2. انتقل إلى الإعدادات → API</p>
+                                <p>3. انقر على "إنشاء Token جديد"</p>
+                                <p>4. انسخ Token والصقه هنا</p>
+                            </div>
+                        </div>
+
+                        <button class="btn-save" disabled>حفظ التغييرات</button>
+                    </div>
+                </section>
+
+                <!-- Sync Settings Card -->
+                <section class="settings-card">
+                    <div class="card-header">
+                        <h3>⚙️ إعدادات المزامنة</h3>
+                    </div>
+
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>تكرار المزامنة التلقائية</label>
+                            <select>
+                                <option value="5">كل 5 دقائق</option>
+                                <option value="15" selected>كل 15 دقيقة</option>
+                                <option value="30">كل 30 دقيقة</option>
+                                <option value="60">كل ساعة</option>
+                                <option value="manual">يدوي فقط</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked>
+                                <span>مزامنة المنتجات الجديدة تلقائيًا</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked>
+                                <span>مزامنة الأسعار عند التحديث</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox">
+                                <span>مزامنة المخزون</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked>
+                                <span>إشعارات عند فشل المزامنة</span>
+                            </label>
+                        </div>
+
+                        <button class="btn-save-primary">حفظ الإعدادات</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sync Actions Card -->
+            <section class="sync-actions-card">
+                <h3>إجراءات المزامنة</h3>
+                <div class="sync-actions-grid">
+                    <button class="sync-action-btn">
+                        <span class="sync-action-icon">🔄</span>
+                        <div class="sync-action-content">
+                            <h4>مزامنة المنتجات</h4>
+                            <p>سحب جميع المنتجات من متجرك</p>
+                        </div>
+                    </button>
+
+                    <button class="sync-action-btn">
+                        <span class="sync-action-icon">⬆️</span>
+                        <div class="sync-action-content">
+                            <h4>تحديث الأسعار</h4>
+                            <p>رفع الأسعار المحدثة لمتجرك</p>
+                        </div>
+                    </button>
+
+                    <button class="sync-action-btn">
+                        <span class="sync-action-icon">🔍</span>
+                        <div class="sync-action-content">
+                            <h4>فحص الاتصال</h4>
+                            <p>التأكد من سلامة الاتصال</p>
+                        </div>
+                    </button>
+
+                    <button class="sync-action-btn">
+                        <span class="sync-action-icon">📋</span>
+                        <div class="sync-action-content">
+                            <h4>سجل المزامنة</h4>
+                            <p>عرض تاريخ عمليات المزامنة</p>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Sync History -->
+            <section class="sync-history-card">
+                <h3>سجل المزامنة الأخير</h3>
+                <div class="sync-history-list">
+                    <div class="sync-history-item success">
+                        <div class="sync-history-icon">✓</div>
+                        <div class="sync-history-content">
+                            <h4>مزامنة المنتجات</h4>
+                            <p>تم سحب 1,248 منتج بنجاح</p>
+                        </div>
+                        <span class="sync-history-time">منذ 5 دقائق</span>
+                    </div>
+
+                    <div class="sync-history-item success">
+                        <div class="sync-history-icon">✓</div>
+                        <div class="sync-history-content">
+                            <h4>تحديث الأسعار</h4>
+                            <p>تم تحديث 856 سعر في متجرك</p>
+                        </div>
+                        <span class="sync-history-time">منذ 20 دقيقة</span>
+                    </div>
+
+                    <div class="sync-history-item warning">
+                        <div class="sync-history-icon">⚠️</div>
+                        <div class="sync-history-content">
+                            <h4>مزامنة جزئية</h4>
+                            <p>تم تحديث 820 منتج، فشل 12 منتج</p>
+                        </div>
+                        <span class="sync-history-time">منذ ساعة</span>
+                    </div>
+
+                    <div class="sync-history-item success">
+                        <div class="sync-history-icon">✓</div>
+                        <div class="sync-history-content">
+                            <h4>فحص الاتصال</h4>
+                            <p>الاتصال بـ API سليم</p>
+                        </div>
+                        <span class="sync-history-time">منذ ساعتين</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعديل المنتج | AuraPrice</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="integration.css">
+    <link rel="stylesheet" href="edit-product.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>
+                    <span class="logo-icon">✦</span>
+                    AuraPrice
+                </h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>لوحة التحكم</span>
+                </a>
+                <a href="products.html" class="nav-item active">
+                    <span class="nav-icon">💍</span>
+                    <span>إدارة المنتجات</span>
+                </a>
+                <a href="pricing.html" class="nav-item">
+                    <span class="nav-icon">💰</span>
+                    <span>إعدادات التسعير</span>
+                </a>
+                <a href="salla-integration.html" class="nav-item">
+                    <span class="nav-icon">🔗</span>
+                    <span>ربط منصة سلة</span>
+                </a>
+                <a href="automation.html" class="nav-item">
+                    <span class="nav-icon">⚡</span>
+                    <span>التحديث التلقائي</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>التقارير</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>الإعدادات</span>
+                </a>
+                <a href="index.html" class="nav-item" style="margin-top: 2rem; color: #EF4444;">
+                    <span class="nav-icon">🚪</span>
+                    <span>تسجيل الخروج</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <h1>تعديل المنتج: سوارة ذهب جزرير عيار 21 ✏️</h1>
+                    <p>تحديث معلومات وأسعار المنتج</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-back" onclick="history.back()">
+                        <span>←</span>
+                        رجوع
+                    </button>
+                </div>
+            </header>
+
+            <!-- Edit Product Form -->
+            <div class="edit-form-container">
+                <!-- Product Information Card -->
+                <section class="form-card">
+                    <div class="card-header">
+                        <h3>📦 معلومات المنتج الأساسية</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>النوع <span class="required">*</span></label>
+                            <select id="productType">
+                                <option value="gold">ذهب</option>
+                                <option value="silver">فضة</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>العيار <span class="required">*</span></label>
+                            <select id="carat">
+                                <option value="24">24</option>
+                                <option value="22">22</option>
+                                <option value="21" selected>21</option>
+                                <option value="18">18</option>
+                                <option value="14">14</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>المصنعية <span class="required">*</span></label>
+                            <input type="number" id="craftsmanship" value="50" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label>الوزن (جرام) <span class="required">*</span></label>
+                            <input type="number" id="weight" value="6.78" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label>السعر الإضافي <span class="required">*</span></label>
+                            <input type="number" id="additionalPrice" value="700" step="0.01">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pricing Calculation Card -->
+                <section class="form-card">
+                    <div class="card-header">
+                        <h3>💰 حساب السعر التلقائي</h3>
+                    </div>
+
+                    <!-- Current Gold Prices Display -->
+                    <div class="gold-prices-display">
+                        <h4>أسعار الذهب الحالية:</h4>
+                        <div class="prices-grid">
+                            <div class="price-item">
+                                <span class="price-label">عيار 24</span>
+                                <span class="price-value">375.20 ر.س</span>
+                            </div>
+                            <div class="price-item">
+                                <span class="price-label">عيار 22</span>
+                                <span class="price-value">343.93 ر.س</span>
+                            </div>
+                            <div class="price-item active">
+                                <span class="price-label">عيار 21</span>
+                                <span class="price-value">328.30 ر.س</span>
+                            </div>
+                            <div class="price-item">
+                                <span class="price-label">عيار 18</span>
+                                <span class="price-value">281.40 ر.س</span>
+                            </div>
+                            <div class="price-item">
+                                <span class="price-label">عيار 14</span>
+                                <span class="price-value">218.87 ر.س</span>
+                            </div>
+                            <div class="price-item silver">
+                                <span class="price-label">الفضة</span>
+                                <span class="price-value">3.85 ر.س</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profit Margin Settings -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>الزيادة الإضافية (%) <span class="required">*</span></label>
+                            <input type="number" id="profitMargin" value="7" step="0.1" min="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label>نوع الزيادة</label>
+                            <select id="increaseType">
+                                <option value="percentage">نسبة مئوية %</option>
+                                <option value="fixed">مبلغ ثابت</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>نوع الخصم</label>
+                            <select id="discountType">
+                                <option value="none">بلا خصم</option>
+                                <option value="percentage">نسبة مئوية %</option>
+                                <option value="fixed">مبلغ ثابت</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="includeTax" checked>
+                                <span>خاضع للضريبة (VAT 15%)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Price Calculation Display -->
+                    <div class="price-calculation-box">
+                        <div class="calculation-row">
+                            <span class="calc-label">سعر الذهب (عيار 21):</span>
+                            <span class="calc-value">328.30 ر.س/جم</span>
+                        </div>
+                        <div class="calculation-row">
+                            <span class="calc-label">الوزن:</span>
+                            <span class="calc-value">6.78 جم</span>
+                        </div>
+                        <div class="calculation-row">
+                            <span class="calc-label">سعر الذهب الإجمالي:</span>
+                            <span class="calc-value">2,225.87 ر.س</span>
+                        </div>
+                        <div class="calculation-row">
+                            <span class="calc-label">المصنعية:</span>
+                            <span class="calc-value">50 ر.س</span>
+                        </div>
+                        <div class="calculation-row">
+                            <span class="calc-label">السعر الإضافي:</span>
+                            <span class="calc-value">700 ر.س</span>
+                        </div>
+                        <div class="calculation-row">
+                            <span class="calc-label">الإجمالي قبل الزيادة:</span>
+                            <span class="calc-value">2,975.87 ر.س</span>
+                        </div>
+                        <div class="calculation-row highlight">
+                            <span class="calc-label">الزيادة الإضافية (7%):</span>
+                            <span class="calc-value profit">+208.31 ر.س</span>
+                        </div>
+                        <div class="calculation-row highlight">
+                            <span class="calc-label">المكسب بعد الزيادة:</span>
+                            <span class="calc-value profit-total">208.31 ر.س</span>
+                        </div>
+                        <div class="calculation-row total">
+                            <span class="calc-label">السعر النهائي:</span>
+                            <span class="calc-value">3,184.18 ر.س</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>السعر الثابت (اختياري)</label>
+                        <input type="number" id="fixedPrice" placeholder="اترك فارغًا للحساب التلقائي" step="0.01">
+                        <small class="help-text">إذا تم إدخال سعر ثابت، سيتم استخدامه بدلاً من الحساب التلقائي</small>
+                    </div>
+                </section>
+
+                <!-- Product Variants Section -->
+                <section class="form-card">
+                    <div class="card-header">
+                        <h3>🔀 متغيرات المنتج (أوزان مختلفة)</h3>
+                        <button class="btn-add-variant" id="addVariantBtn">
+                            <span>+</span>
+                            إضافة متغير
+                        </button>
+                    </div>
+
+                    <div class="variants-info">
+                        <p>يمكنك إضافة متغيرات للمنتج بأوزان مختلفة لنفس الموديل، سيتم حساب السعر تلقائيًا لكل متغير</p>
+                    </div>
+
+                    <div class="variants-list" id="variantsList">
+                        <div class="variant-item">
+                            <div class="variant-header">
+                                <span class="variant-number">متغير #1</span>
+                                <button class="btn-remove-variant">حذف</button>
+                            </div>
+                            <div class="variant-grid">
+                                <div class="form-group">
+                                    <label>الوزن (جرام)</label>
+                                    <input type="number" value="5.5" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label>السعر المحسوب</label>
+                                    <input type="number" value="2,890.50" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="variant-item">
+                            <div class="variant-header">
+                                <span class="variant-number">متغير #2</span>
+                                <button class="btn-remove-variant">حذف</button>
+                            </div>
+                            <div class="variant-grid">
+                                <div class="form-group">
+                                    <label>الوزن (جرام)</label>
+                                    <input type="number" value="7.2" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label>السعر المحسوب</label>
+                                    <input type="number" value="3,452.80" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button class="btn-cancel" onclick="history.back()">إلغاء</button>
+                    <button class="btn-save-product">
+                        <span>💾</span>
+                        حفظ التعديلات
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="edit-product.js"></script>
+</body>
+</html>

@@ -20,6 +20,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+fetch("https://aura-backend-vdqi.onrender.com/api/health")
+  .then(res => res.json())
+  .then(data => {
+    console.log("Backend says:", data);
+    alert("الاتصال بالسيرفر تم بنجاح ✅");
+  })
+  .catch(err => {
+    console.error(err);
+    alert("فيه مشكلة في الاتصال بالسيرفر ❌");
+  });
 
 // ===== Select All Checkbox =====
 const selectAllCheckbox = document.getElementById('selectAll');

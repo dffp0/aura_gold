@@ -153,6 +153,10 @@
                         <span class="products-count">عرض <strong>1-30</strong> من <strong>1,248</strong> منتج</span>
                     </div>
                     <div class="table-actions">
+                        <button class="btn-table-action" onclick="autoDetectCarats()">
+                            <span>🎯</span>
+                            تسجيل العيار تلقائي
+                        </button>
                         <button class="btn-table-action">
                             <span>📥</span>
                             استيراد
@@ -175,7 +179,6 @@
                                 <th><input type="checkbox" id="selectAll"></th>
                                 <th>صورة</th>
                                 <th>اسم المنتج</th>
-                                <th>SKU</th>
                                 <th>الفئة</th>
                                 <th>العيار</th>
                                 <th>الوزن (جرام)</th>
@@ -190,7 +193,7 @@
                         <tbody>
                             <!-- المنتجات تُجلب من السيرفر -->
                             <tr>
-                                <td colspan="13" style="text-align: center; padding: 3rem;">
+                                <td colspan="12" style="text-align: center; padding: 3rem;">
                                     <div style="color: #666;">
                                         <span style="font-size: 3rem;">📦</span>
                                         <p style="margin-top: 1rem;">اضغط على "مزامنة مع سلة" لجلب منتجاتك</p>
@@ -221,87 +224,84 @@
     <div id="editProductModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>تعديل المنتج: خاتم ذهب كلاسيكي</h2>
+                <h2>تعديل التسعير</h2>
                 <button class="modal-close" onclick="closeEditModal()">&times;</button>
             </div>
 
             <div class="modal-body">
-                <!-- Product Information -->
+                <!-- معلومات المنتج (للقراءة فقط) -->
                 <div class="modal-section">
                     <h3>📦 معلومات المنتج</h3>
-                    <div class="modal-form-grid">
-                        <div class="modal-form-group">
-                            <label>النوع</label>
-                            <select id="modalProductType">
-                                <option value="gold">ذهب</option>
-                                <option value="silver">فضة</option>
-                            </select>
-                        </div>
+                    <div class="modal-product-info" id="modalProductInfo">
+                        <p><strong>الوزن:</strong> <span id="modalWeightDisplay">-</span> جرام</p>
+                    </div>
+                    <input type="hidden" id="modalWeight" value="0">
+                </div>
 
+                <!-- إعدادات التسعير -->
+                <div class="modal-section">
+                    <h3>💰 إعدادات التسعير</h3>
+                    <div class="modal-form-grid">
                         <div class="modal-form-group">
                             <label>العيار</label>
                             <select id="modalCarat">
+                                <option value="">غير محدد</option>
                                 <option value="24">24</option>
                                 <option value="22">22</option>
-                                <option value="21" selected>21</option>
+                                <option value="21">21</option>
                                 <option value="18">18</option>
                                 <option value="14">14</option>
                             </select>
                         </div>
 
                         <div class="modal-form-group">
-                            <label>المصنعية</label>
-                            <input type="number" id="modalCraftsmanship" value="50" step="0.01">
+                            <label>المصنعية (ر.س)</label>
+                            <input type="number" id="modalCraftsmanship" value="0" step="0.01" min="0">
                         </div>
 
                         <div class="modal-form-group">
-                            <label>الوزن (جرام)</label>
-                            <input type="number" id="modalWeight" value="5.2" step="0.01">
+                            <label>السعر الإضافي (ر.س)</label>
+                            <input type="number" id="modalAdditionalPrice" value="0" step="0.01" min="0">
                         </div>
 
                         <div class="modal-form-group">
-                            <label>السعر الإضافي</label>
-                            <input type="number" id="modalAdditionalPrice" value="700" step="0.01">
-                        </div>
-
-                        <div class="modal-form-group">
-                            <label>الزيادة الإضافية (%)</label>
-                            <input type="number" id="modalProfitMargin" value="7" step="0.1">
+                            <label>هامش الربح (%)</label>
+                            <input type="number" id="modalProfitMargin" value="0" step="0.1" min="0">
                         </div>
                     </div>
                 </div>
 
-                <!-- Price Calculation -->
+                <!-- حساب السعر -->
                 <div class="modal-section">
-                    <h3>💰 حساب السعر</h3>
+                    <h3>🧮 حساب السعر</h3>
                     <div class="modal-price-box">
                         <div class="modal-price-row">
-                            <span>سعر الذهب (عيار 21):</span>
-                            <span class="modal-price-value">328.30 ر.س/جم</span>
+                            <span>سعر الذهب:</span>
+                            <span class="modal-price-value">-</span>
                         </div>
                         <div class="modal-price-row">
                             <span>الوزن:</span>
-                            <span class="modal-price-value">5.2 جم</span>
+                            <span class="modal-price-value">-</span>
                         </div>
                         <div class="modal-price-row">
                             <span>سعر الذهب الإجمالي:</span>
-                            <span class="modal-price-value">1,707.16 ر.س</span>
+                            <span class="modal-price-value">-</span>
                         </div>
                         <div class="modal-price-row">
                             <span>المصنعية:</span>
-                            <span class="modal-price-value">50 ر.س</span>
+                            <span class="modal-price-value">-</span>
                         </div>
                         <div class="modal-price-row">
                             <span>السعر الإضافي:</span>
-                            <span class="modal-price-value">700 ر.س</span>
+                            <span class="modal-price-value">-</span>
                         </div>
                         <div class="modal-price-row highlight">
-                            <span>المكسب (7%):</span>
-                            <span class="modal-price-value profit">+172.00 ر.س</span>
+                            <span>الربح:</span>
+                            <span class="modal-price-value profit">-</span>
                         </div>
                         <div class="modal-price-row total">
                             <span>السعر النهائي:</span>
-                            <span class="modal-price-value">2,629.16 ر.س</span>
+                            <span class="modal-price-value">-</span>
                         </div>
                     </div>
                 </div>
@@ -309,15 +309,7 @@
                 <!-- Variants Section (Hidden by default for products without variants) -->
                 <div class="modal-section" id="variantsSection" style="display: none;">
                     <h3>🔀 متغيرات المنتج</h3>
-                    <div class="modal-variants-list">
-                        <div class="modal-variant-item">
-                            <span>متغير #1 - الوزن: 4.5 جم</span>
-                            <span class="variant-price">2,450 ر.س</span>
-                        </div>
-                        <div class="modal-variant-item">
-                            <span>متغير #2 - الوزن: 6.0 جم</span>
-                            <span class="variant-price">2,800 ر.س</span>
-                        </div>
+                    <div class="modal-variants-list" id="modalVariantsList">
                     </div>
                 </div>
             </div>

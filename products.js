@@ -7,6 +7,7 @@ let products = [];
 let filteredProducts = [];
 let currentPage = 1;
 let isLoading = false;
+let currentGoldPrice = 0; // سعر الذهب الحالي
 
 // عناصر الصفحة
 const productsTableBody = document.querySelector('.products-table tbody');
@@ -15,6 +16,33 @@ const productsCountElement = document.querySelector('.products-count');
 const statsComplete = document.querySelector('.products-stat-card.complete .stat-number');
 const statsIncomplete = document.querySelector('.products-stat-card.incomplete .stat-number');
 const statsTotal = document.querySelector('.products-stat-card.total .stat-number');
+
+// ===== جلب سعر الذهب =====
+async function fetchGoldPrice() {
+    try {
+        // استخدام API مجاني لسعر الذهب
+        const response = await fetch('https://api.gold-api.com/price/XAU/SAR');
+        const data = await response.json();
+        if (data.price) {
+            // تحويل سعر الأونصة إلى سعر الجرام (1 أونصة = 31.1035 جرام)
+            currentGoldPrice = data.price / 31.1035;
+            console.log('سعر الذهب عيار 24:', currentGoldPrice.toFixed(2), 'ر.س/جرام');
+            localStorage.setItem('aura_gold_price', currentGoldPrice);
+            localStorage.setItem('aura_gold_price_time', new Date().toISOString());
+            return currentGoldPrice;
+        }
+    } catch (error) {
+        console.error('خطأ في جلب سعر الذهب:', error);
+        // استخدام السعر المحفوظ
+        const savedPrice = localStorage.getItem('aura_gold_price');
+        if (savedPrice) {
+            currentGoldPrice = parseFloat(savedPrice);
+        } else {
+            currentGoldPrice = 338.87; // سعر افتراضي
+        }
+    }
+    return currentGoldPrice;
+}
 
 // ===== تحميل المنتجات من localStorage =====
 function loadProductsFromStorage() {
@@ -58,11 +86,9 @@ async function fetchProducts() {
             return;
         }
 
-        // سلة ترجع البيانات في data.data
         products = data.data || data;
         filteredProducts = [...products];
 
-        // حفظ في localStorage
         saveProductsToStorage();
 
         currentPage = 1;
@@ -86,7 +112,7 @@ function renderProducts() {
     if (!filteredProducts || filteredProducts.length === 0) {
         productsTableBody.innerHTML = `
             <tr>
-                <td colspan="13" style="text-align: center; padding: 3rem;">
+                <td colspan="12" style="text-align: center; padding: 3rem;">
                     <div style="color: #666;">
                         <span style="font-size: 3rem;">📦</span>
                         <p style="margin-top: 1rem;">لا توجد منتجات</p>
@@ -99,7 +125,6 @@ function renderProducts() {
         return;
     }
 
-    // حساب المنتجات للصفحة الحالية
     const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
     const endIndex = startIndex + PRODUCTS_PER_PAGE;
     const pageProducts = filteredProducts.slice(startIndex, endIndex);
@@ -107,20 +132,25 @@ function renderProducts() {
     productsTableBody.innerHTML = pageProducts.map((product) => {
         const mainImage = product.images?.[0]?.url || product.thumbnail || '';
         const price = product.price?.amount || product.price || 0;
-        const sku = product.sku || `SKU-${product.id}`;
+        const sku = product.sku || '-';
         const category = product.categories?.[0]?.name || 'غير مصنف';
         const status = product.status || 'active';
 
-        // استخراج الوزن والعيار
+        // استخراج الوزن من المنتج
         const weight = extractWeight(product);
-        const carat = extractCarat(product);
+
+        // العيار يبقى "غير محدد" حتى يحدده المستخدم
+        const savedCarat = localStorage.getItem(`product_carat_${product.id}`);
+        const carat = savedCarat || 'غير محدد';
+
+        // حساب سعر الذهب
         const goldPrice = calculateGoldPrice(weight, carat);
 
         return `
             <tr data-product-id="${product.id}">
                 <td><input type="checkbox" class="product-checkbox"></td>
                 <td>
-                    <div class="product-image">
+                    <div class="product-image" onclick="showImageModal('${mainImage}', '${product.name}')" style="cursor: pointer;">
                         ${mainImage
                             ? `<img src="${mainImage}" alt="${product.name}" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>💍</div>'">`
                             : '<div class="product-image-placeholder">💍</div>'
@@ -130,12 +160,11 @@ function renderProducts() {
                 <td>
                     <div class="product-name">
                         <strong>${product.name}</strong>
-                        <span class="product-subtitle">${(product.description || '').substring(0, 30)}...</span>
+                        <span class="product-subtitle sku-text">${sku}</span>
                     </div>
                 </td>
-                <td><span class="sku">${sku}</span></td>
                 <td><span class="category">${category}</span></td>
-                <td><span class="carat gold-${carat}">${carat || '-'}</span></td>
+                <td><span class="carat ${carat !== 'غير محدد' ? 'gold-' + carat : ''}">${carat}</span></td>
                 <td><span class="weight">${weight || '-'}</span></td>
                 <td><span class="gold-price">${goldPrice ? goldPrice.toLocaleString('ar-SA') + ' ر.س' : '-'}</span></td>
                 <td><span class="final-price">${parseFloat(price).toLocaleString('ar-SA')} ر.س</span></td>
@@ -152,16 +181,14 @@ function renderProducts() {
                 <td><span class="status-badge ${status === 'active' ? 'success' : 'warning'}">${status === 'active' ? 'نشط' : 'غير نشط'}</span></td>
                 <td>
                     <div class="action-buttons">
-                        <button class="btn-action" title="تحرير" onclick="editProduct('${product.id}')">✏️</button>
+                        <button class="btn-action" title="تعديل التسعير" onclick="openEditModal('${product.id}')">✏️</button>
                         <button class="btn-action" title="تحديث السعر" onclick="updateProductPrice('${product.id}')">⚡</button>
-                        <button class="btn-action danger" title="حذف" onclick="deleteProduct('${product.id}')">🗑️</button>
                     </div>
                 </td>
             </tr>
         `;
     }).join('');
 
-    // تحديث العداد
     if (productsCountElement) {
         const start = startIndex + 1;
         const end = Math.min(endIndex, filteredProducts.length);
@@ -169,6 +196,192 @@ function renderProducts() {
     }
 
     updatePagination(filteredProducts.length);
+}
+
+// ===== عرض الصورة المكبرة =====
+function showImageModal(imageUrl, productName) {
+    if (!imageUrl) return;
+
+    // إنشاء Modal للصورة
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.innerHTML = `
+        <div class="image-modal-content">
+            <button class="image-modal-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+            <img src="${imageUrl}" alt="${productName}">
+            <p>${productName}</p>
+        </div>
+    `;
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
+    document.body.appendChild(modal);
+}
+
+// ===== فتح Modal التعديل =====
+function openEditModal(productId) {
+    const product = products.find(p => p.id == productId);
+    if (!product) return;
+
+    const savedCarat = localStorage.getItem(`product_carat_${product.id}`) || '';
+    const savedCraftsmanship = localStorage.getItem(`product_craftsmanship_${product.id}`) || '0';
+    const savedAdditionalPrice = localStorage.getItem(`product_additional_${product.id}`) || '0';
+    const savedProfitMargin = localStorage.getItem(`product_profit_${product.id}`) || '0';
+    const weight = extractWeight(product) || 0;
+
+    const modal = document.getElementById('editProductModal');
+    if (!modal) return;
+
+    // تحديث عنوان Modal
+    modal.querySelector('.modal-header h2').textContent = `تعديل التسعير: ${product.name}`;
+
+    // عرض الوزن (للقراءة فقط)
+    const weightDisplay = document.getElementById('modalWeightDisplay');
+    if (weightDisplay) {
+        weightDisplay.textContent = weight || '-';
+    }
+
+    // حفظ الوزن في حقل مخفي
+    const weightInput = document.getElementById('modalWeight');
+    if (weightInput) {
+        weightInput.value = weight;
+    }
+
+    // العيار (قابل للتعديل)
+    const caratSelect = document.getElementById('modalCarat');
+    if (caratSelect) {
+        caratSelect.value = savedCarat || '';
+    }
+
+    // المصنعية
+    const craftsmanshipInput = document.getElementById('modalCraftsmanship');
+    if (craftsmanshipInput) {
+        craftsmanshipInput.value = savedCraftsmanship;
+    }
+
+    // السعر الإضافي
+    const additionalInput = document.getElementById('modalAdditionalPrice');
+    if (additionalInput) {
+        additionalInput.value = savedAdditionalPrice;
+    }
+
+    // هامش الربح
+    const profitInput = document.getElementById('modalProfitMargin');
+    if (profitInput) {
+        profitInput.value = savedProfitMargin;
+    }
+
+    // حفظ ID المنتج الحالي
+    modal.dataset.productId = productId;
+
+    // حساب السعر
+    updatePriceCalculation();
+
+    // إظهار Modal
+    modal.classList.add('active');
+}
+
+// ===== إغلاق Modal =====
+function closeEditModal() {
+    const modal = document.getElementById('editProductModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// ===== حفظ بيانات المنتج =====
+function saveProduct() {
+    const modal = document.getElementById('editProductModal');
+    const productId = modal?.dataset.productId;
+    if (!productId) return;
+
+    const carat = document.getElementById('modalCarat')?.value || '';
+    const craftsmanship = document.getElementById('modalCraftsmanship')?.value || '0';
+    const additionalPrice = document.getElementById('modalAdditionalPrice')?.value || '0';
+    const profitMargin = document.getElementById('modalProfitMargin')?.value || '0';
+
+    // حفظ في localStorage
+    if (carat) localStorage.setItem(`product_carat_${productId}`, carat);
+    localStorage.setItem(`product_craftsmanship_${productId}`, craftsmanship);
+    localStorage.setItem(`product_additional_${productId}`, additionalPrice);
+    localStorage.setItem(`product_profit_${productId}`, profitMargin);
+
+    showNotification('تم حفظ التعديلات بنجاح', 'success');
+    closeEditModal();
+    renderProducts();
+}
+
+// ===== تحديث حساب السعر في Modal =====
+function updatePriceCalculation() {
+    const weight = parseFloat(document.getElementById('modalWeight')?.value) || 0;
+    const carat = document.getElementById('modalCarat')?.value || '';
+    const craftsmanship = parseFloat(document.getElementById('modalCraftsmanship')?.value) || 0;
+    const additionalPrice = parseFloat(document.getElementById('modalAdditionalPrice')?.value) || 0;
+    const profitMargin = parseFloat(document.getElementById('modalProfitMargin')?.value) || 0;
+
+    // أسعار العيارات
+    const caratPrices = {
+        '24': currentGoldPrice || 338.87,
+        '22': (currentGoldPrice || 338.87) * 0.9167,
+        '21': (currentGoldPrice || 338.87) * 0.875,
+        '18': (currentGoldPrice || 338.87) * 0.75,
+        '14': (currentGoldPrice || 338.87) * 0.583
+    };
+
+    const pricePerGram = caratPrices[carat] || 0;
+    const goldTotal = weight * pricePerGram;
+    const subtotal = goldTotal + craftsmanship + additionalPrice;
+    const profit = subtotal * (profitMargin / 100);
+    const finalPrice = subtotal + profit;
+
+    // تحديث العرض
+    const priceBox = document.querySelector('.modal-price-box');
+    if (priceBox) {
+        priceBox.innerHTML = `
+            <div class="modal-price-row">
+                <span>سعر الذهب (عيار ${carat || '-'}):</span>
+                <span class="modal-price-value">${pricePerGram.toFixed(2)} ر.س/جم</span>
+            </div>
+            <div class="modal-price-row">
+                <span>الوزن:</span>
+                <span class="modal-price-value">${weight} جم</span>
+            </div>
+            <div class="modal-price-row">
+                <span>سعر الذهب الإجمالي:</span>
+                <span class="modal-price-value">${goldTotal.toFixed(2)} ر.س</span>
+            </div>
+            <div class="modal-price-row">
+                <span>المصنعية:</span>
+                <span class="modal-price-value">${craftsmanship} ر.س</span>
+            </div>
+            <div class="modal-price-row">
+                <span>السعر الإضافي:</span>
+                <span class="modal-price-value">${additionalPrice} ر.س</span>
+            </div>
+            <div class="modal-price-row highlight">
+                <span>الربح (${profitMargin}%):</span>
+                <span class="modal-price-value profit">+${profit.toFixed(2)} ر.س</span>
+            </div>
+            <div class="modal-price-row total">
+                <span>السعر النهائي:</span>
+                <span class="modal-price-value">${finalPrice.toFixed(2)} ر.س</span>
+            </div>
+        `;
+    }
+}
+
+// ===== تسجيل العيار التلقائي =====
+function autoDetectCarats() {
+    let updated = 0;
+    products.forEach(product => {
+        const detected = extractCarat(product);
+        if (detected) {
+            localStorage.setItem(`product_carat_${product.id}`, detected);
+            updated++;
+        }
+    });
+    showNotification(`تم تحديد العيار لـ ${updated} منتج`, 'success');
+    renderProducts();
 }
 
 // ===== تحديث أزرار الصفحات =====
@@ -181,11 +394,9 @@ function updatePagination(totalProducts) {
 
     const totalPages = Math.ceil(totalProducts / PRODUCTS_PER_PAGE);
 
-    // تحديث أزرار السابق والتالي
     if (prevBtn) prevBtn.disabled = currentPage === 1;
     if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
 
-    // إنشاء أرقام الصفحات
     let pagesHTML = '';
     for (let i = 1; i <= Math.min(totalPages, 5); i++) {
         pagesHTML += `<button class="pagination-number ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
@@ -198,14 +409,12 @@ function updatePagination(totalProducts) {
     paginationContainer.innerHTML = pagesHTML;
 }
 
-// ===== الانتقال لصفحة معينة =====
 function goToPage(page) {
     currentPage = page;
     renderProducts();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ===== الصفحة السابقة =====
 function prevPage() {
     if (currentPage > 1) {
         currentPage--;
@@ -213,7 +422,6 @@ function prevPage() {
     }
 }
 
-// ===== الصفحة التالية =====
 function nextPage() {
     const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
     if (currentPage < totalPages) {
@@ -224,18 +432,22 @@ function nextPage() {
 
 // ===== استخراج الوزن من المنتج =====
 function extractWeight(product) {
-    if (product.metadata?.weight) return product.metadata.weight;
     if (product.weight) return product.weight;
+    if (product.metadata?.weight) return product.metadata.weight;
 
-    // جرب من الخصائص
+    // من الخصائص
     if (product.options) {
         const weightOption = product.options.find(opt =>
             opt.name?.includes('وزن') || opt.name?.toLowerCase().includes('weight')
         );
-        if (weightOption) return weightOption.values?.[0]?.name || weightOption.value;
+        if (weightOption) {
+            const val = weightOption.values?.[0]?.name || weightOption.value;
+            const num = parseFloat(val);
+            if (!isNaN(num)) return num;
+        }
     }
 
-    // جرب من الوصف أو الاسم
+    // من الاسم أو الوصف
     const text = (product.name || '') + ' ' + (product.description || '');
     const weightMatch = text.match(/(\d+\.?\d*)\s*(جرام|جم|gram|g)/i);
     if (weightMatch) return parseFloat(weightMatch[1]);
@@ -243,7 +455,7 @@ function extractWeight(product) {
     return null;
 }
 
-// ===== استخراج العيار من المنتج =====
+// ===== استخراج العيار من المنتج (للتسجيل التلقائي) =====
 function extractCarat(product) {
     if (product.metadata?.carat) return product.metadata.carat;
 
@@ -251,31 +463,39 @@ function extractCarat(product) {
         const caratOption = product.options.find(opt =>
             opt.name?.includes('عيار') || opt.name?.toLowerCase().includes('carat') || opt.name?.toLowerCase().includes('karat')
         );
-        if (caratOption) return caratOption.values?.[0]?.name || caratOption.value;
+        if (caratOption) {
+            const val = caratOption.values?.[0]?.name || caratOption.value;
+            const num = parseInt(val);
+            if ([14, 18, 21, 22, 24].includes(num)) return num.toString();
+        }
     }
 
-    // جرب من الاسم أو الوصف
+    // من الاسم أو الوصف
     const text = (product.name || '') + ' ' + (product.description || '');
     const caratMatch = text.match(/عيار\s*(\d+)|(\d+)\s*k/i);
-    if (caratMatch) return caratMatch[1] || caratMatch[2];
+    if (caratMatch) {
+        const num = parseInt(caratMatch[1] || caratMatch[2]);
+        if ([14, 18, 21, 22, 24].includes(num)) return num.toString();
+    }
 
     return null;
 }
 
 // ===== حساب سعر الذهب =====
 function calculateGoldPrice(weight, carat) {
-    if (!weight || !carat) return null;
+    if (!weight || !carat || carat === 'غير محدد') return null;
 
-    const goldPrices = {
-        24: 338.87,
-        22: 310.64,
-        21: 296.51,
-        18: 254.15,
-        14: 197.67
+    const basePrice = currentGoldPrice || 338.87;
+    const caratMultipliers = {
+        '24': 1,
+        '22': 0.9167,
+        '21': 0.875,
+        '18': 0.75,
+        '14': 0.583
     };
 
-    const pricePerGram = goldPrices[parseInt(carat)] || 0;
-    return Math.round(weight * pricePerGram);
+    const multiplier = caratMultipliers[carat] || 0;
+    return Math.round(weight * basePrice * multiplier);
 }
 
 // ===== تنسيق التاريخ =====
@@ -334,7 +554,7 @@ function showLoading() {
     if (productsTableBody) {
         productsTableBody.innerHTML = `
             <tr>
-                <td colspan="13" style="text-align: center; padding: 3rem;">
+                <td colspan="12" style="text-align: center; padding: 3rem;">
                     <div style="color: #666;">
                         <span style="font-size: 2rem; animation: spin 1s linear infinite; display: inline-block;">🔄</span>
                         <p style="margin-top: 1rem;">جاري جلب المنتجات من سلة...</p>
@@ -345,7 +565,6 @@ function showLoading() {
     }
 }
 
-// ===== إخفاء حالة التحميل =====
 function hideLoading() {
     if (syncButton) {
         syncButton.innerHTML = '<span>🔄</span> مزامنة مع سلة';
@@ -381,13 +600,9 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// ===== تعديل منتج =====
+// ===== تعديل منتج (للتوافق مع الكود القديم) =====
 function editProduct(productId) {
-    const product = products.find(p => p.id == productId);
-    if (product) {
-        localStorage.setItem('editProduct', JSON.stringify(product));
-        window.location.href = `edit-product.html?id=${productId}`;
-    }
+    openEditModal(productId);
 }
 
 // ===== تحديث سعر منتج =====
@@ -406,16 +621,12 @@ function showVariants(productId) {
     }
 }
 
-// ===== حذف منتج =====
-function deleteProduct(productId) {
-    if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-        showNotification('لا يمكن الحذف من هنا، احذف من سلة مباشرة', 'error');
-    }
-}
-
 // ===== ربط الأحداث =====
 document.addEventListener('DOMContentLoaded', function() {
-    // تحميل المنتجات المحفوظة أولاً
+    // جلب سعر الذهب
+    fetchGoldPrice();
+
+    // تحميل المنتجات المحفوظة
     loadProductsFromStorage();
 
     // ربط زر المزامنة
@@ -435,6 +646,15 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('input', (e) => searchProducts(e.target.value));
     }
 
+    // ربط حقول Modal للحساب التلقائي
+    ['modalCarat', 'modalCraftsmanship', 'modalAdditionalPrice', 'modalProfitMargin'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', updatePriceCalculation);
+            el.addEventListener('input', updatePriceCalculation);
+        }
+    });
+
     // إضافة أنيميشن
     const style = document.createElement('style');
     style.textContent = `
@@ -449,6 +669,48 @@ document.addEventListener('DOMContentLoaded', function() {
         @keyframes slideOut {
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(400px); opacity: 0; }
+        }
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .image-modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            text-align: center;
+        }
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 12px;
+        }
+        .image-modal-content p {
+            color: white;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+        .image-modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .sku-text {
+            color: #888;
+            font-size: 0.75rem;
         }
     `;
     document.head.appendChild(style);

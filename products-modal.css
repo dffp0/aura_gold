@@ -115,6 +115,25 @@
     border-bottom: 2px solid var(--border-color);
 }
 
+/* Modal Product Info (Read Only) */
+.modal-product-info {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    border-right: 4px solid var(--accent-gold);
+}
+
+.modal-product-info p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+.modal-product-info span {
+    color: var(--accent-gold);
+    font-weight: 700;
+}
+
 /* Modal Form */
 .modal-form-grid {
     display: grid;

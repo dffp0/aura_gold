@@ -323,19 +323,28 @@
 
 /* Product Image */
 .product-image {
-    width: 36px;
-    height: 36px;
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.product-image img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
 }
 
 .product-image-placeholder {
-    width: 36px;
-    height: 36px;
+    width: 50px;
+    height: 50px;
     background: linear-gradient(135deg, rgba(255, 184, 0, 0.1) 0%, rgba(255, 200, 55, 0.1) 100%);
-    border-radius: 7px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
 }
 
 /* Product Name */

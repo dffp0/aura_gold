@@ -1,8 +1,11 @@
 // AuraPrice - Products Management
 const API_URL = "https://aura-backend-vdqi.onrender.com";
+const PRODUCTS_PER_PAGE = 60;
 
 // حالة التطبيق
 let products = [];
+let filteredProducts = [];
+let currentPage = 1;
 let isLoading = false;
 
 // عناصر الصفحة
@@ -12,6 +15,32 @@ const productsCountElement = document.querySelector('.products-count');
 const statsComplete = document.querySelector('.products-stat-card.complete .stat-number');
 const statsIncomplete = document.querySelector('.products-stat-card.incomplete .stat-number');
 const statsTotal = document.querySelector('.products-stat-card.total .stat-number');
+
+// ===== تحميل المنتجات من localStorage =====
+function loadProductsFromStorage() {
+    const savedProducts = localStorage.getItem('aura_products');
+    const savedTime = localStorage.getItem('aura_products_time');
+
+    if (savedProducts) {
+        products = JSON.parse(savedProducts);
+        filteredProducts = [...products];
+        renderProducts();
+        updateStats();
+
+        if (savedTime) {
+            const time = new Date(savedTime);
+            console.log('تم تحميل المنتجات المحفوظة من:', time.toLocaleString('ar-SA'));
+        }
+        return true;
+    }
+    return false;
+}
+
+// ===== حفظ المنتجات في localStorage =====
+function saveProductsToStorage() {
+    localStorage.setItem('aura_products', JSON.stringify(products));
+    localStorage.setItem('aura_products_time', new Date().toISOString());
+}
 
 // ===== جلب المنتجات من سلة =====
 async function fetchProducts() {
@@ -31,9 +60,14 @@ async function fetchProducts() {
 
         // سلة ترجع البيانات في data.data
         products = data.data || data;
+        filteredProducts = [...products];
 
-        renderProducts(products);
-        updateStats(products);
+        // حفظ في localStorage
+        saveProductsToStorage();
+
+        currentPage = 1;
+        renderProducts();
+        updateStats();
         showNotification(`تم جلب ${products.length} منتج بنجاح`, 'success');
 
     } catch (error) {
@@ -46,10 +80,10 @@ async function fetchProducts() {
 }
 
 // ===== عرض المنتجات في الجدول =====
-function renderProducts(products) {
+function renderProducts() {
     if (!productsTableBody) return;
 
-    if (!products || products.length === 0) {
+    if (!filteredProducts || filteredProducts.length === 0) {
         productsTableBody.innerHTML = `
             <tr>
                 <td colspan="13" style="text-align: center; padding: 3rem;">
@@ -61,21 +95,25 @@ function renderProducts(products) {
                 </td>
             </tr>
         `;
+        updatePagination(0);
         return;
     }
 
-    productsTableBody.innerHTML = products.map((product, index) => {
+    // حساب المنتجات للصفحة الحالية
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = startIndex + PRODUCTS_PER_PAGE;
+    const pageProducts = filteredProducts.slice(startIndex, endIndex);
+
+    productsTableBody.innerHTML = pageProducts.map((product) => {
         const mainImage = product.images?.[0]?.url || product.thumbnail || '';
         const price = product.price?.amount || product.price || 0;
         const sku = product.sku || `SKU-${product.id}`;
         const category = product.categories?.[0]?.name || 'غير مصنف';
         const status = product.status || 'active';
 
-        // استخراج الوزن والعيار من الوصف أو الخصائص (حسب إعداداتك)
+        // استخراج الوزن والعيار
         const weight = extractWeight(product);
         const carat = extractCarat(product);
-
-        // حساب السعر
         const goldPrice = calculateGoldPrice(weight, carat);
 
         return `
@@ -92,7 +130,7 @@ function renderProducts(products) {
                 <td>
                     <div class="product-name">
                         <strong>${product.name}</strong>
-                        <span class="product-subtitle">${product.description?.substring(0, 30) || ''}...</span>
+                        <span class="product-subtitle">${(product.description || '').substring(0, 30)}...</span>
                     </div>
                 </td>
                 <td><span class="sku">${sku}</span></td>
@@ -125,39 +163,102 @@ function renderProducts(products) {
 
     // تحديث العداد
     if (productsCountElement) {
-        productsCountElement.innerHTML = `عرض <strong>1-${Math.min(30, products.length)}</strong> من <strong>${products.length}</strong> منتج`;
+        const start = startIndex + 1;
+        const end = Math.min(endIndex, filteredProducts.length);
+        productsCountElement.innerHTML = `عرض <strong>${start}-${end}</strong> من <strong>${filteredProducts.length}</strong> منتج`;
+    }
+
+    updatePagination(filteredProducts.length);
+}
+
+// ===== تحديث أزرار الصفحات =====
+function updatePagination(totalProducts) {
+    const paginationContainer = document.querySelector('.pagination-numbers');
+    const prevBtn = document.querySelector('.pagination-btn:first-child');
+    const nextBtn = document.querySelector('.pagination-btn:last-child');
+
+    if (!paginationContainer) return;
+
+    const totalPages = Math.ceil(totalProducts / PRODUCTS_PER_PAGE);
+
+    // تحديث أزرار السابق والتالي
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+    // إنشاء أرقام الصفحات
+    let pagesHTML = '';
+    for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+        pagesHTML += `<button class="pagination-number ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+    if (totalPages > 5) {
+        pagesHTML += '<span class="pagination-dots">...</span>';
+        pagesHTML += `<button class="pagination-number ${totalPages === currentPage ? 'active' : ''}" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+
+    paginationContainer.innerHTML = pagesHTML;
+}
+
+// ===== الانتقال لصفحة معينة =====
+function goToPage(page) {
+    currentPage = page;
+    renderProducts();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== الصفحة السابقة =====
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderProducts();
+    }
+}
+
+// ===== الصفحة التالية =====
+function nextPage() {
+    const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+    if (currentPage < totalPages) {
+        currentPage++;
+        renderProducts();
     }
 }
 
 // ===== استخراج الوزن من المنتج =====
 function extractWeight(product) {
-    // جرب من الخصائص المخصصة
     if (product.metadata?.weight) return product.metadata.weight;
+    if (product.weight) return product.weight;
+
+    // جرب من الخصائص
     if (product.options) {
         const weightOption = product.options.find(opt =>
-            opt.name.includes('وزن') || opt.name.toLowerCase().includes('weight')
+            opt.name?.includes('وزن') || opt.name?.toLowerCase().includes('weight')
         );
         if (weightOption) return weightOption.values?.[0]?.name || weightOption.value;
     }
-    // جرب من الوصف
-    const weightMatch = product.description?.match(/(\d+\.?\d*)\s*(جرام|جم|gram|g)/i);
+
+    // جرب من الوصف أو الاسم
+    const text = (product.name || '') + ' ' + (product.description || '');
+    const weightMatch = text.match(/(\d+\.?\d*)\s*(جرام|جم|gram|g)/i);
     if (weightMatch) return parseFloat(weightMatch[1]);
+
     return null;
 }
 
 // ===== استخراج العيار من المنتج =====
 function extractCarat(product) {
-    // جرب من الخصائص المخصصة
     if (product.metadata?.carat) return product.metadata.carat;
+
     if (product.options) {
         const caratOption = product.options.find(opt =>
-            opt.name.includes('عيار') || opt.name.toLowerCase().includes('carat') || opt.name.toLowerCase().includes('karat')
+            opt.name?.includes('عيار') || opt.name?.toLowerCase().includes('carat') || opt.name?.toLowerCase().includes('karat')
         );
         if (caratOption) return caratOption.values?.[0]?.name || caratOption.value;
     }
+
     // جرب من الاسم أو الوصف
-    const caratMatch = (product.name + ' ' + product.description)?.match(/عيار\s*(\d+)|(\d+)\s*k/i);
+    const text = (product.name || '') + ' ' + (product.description || '');
+    const caratMatch = text.match(/عيار\s*(\d+)|(\d+)\s*k/i);
     if (caratMatch) return caratMatch[1] || caratMatch[2];
+
     return null;
 }
 
@@ -165,7 +266,6 @@ function extractCarat(product) {
 function calculateGoldPrice(weight, carat) {
     if (!weight || !carat) return null;
 
-    // أسعار الذهب التقريبية (يجب تحديثها من API)
     const goldPrices = {
         24: 338.87,
         22: 310.64,
@@ -198,14 +298,30 @@ function formatDate(dateString) {
 }
 
 // ===== تحديث الإحصائيات =====
-function updateStats(products) {
+function updateStats() {
     const total = products.length;
-    const complete = products.filter(p => p.status === 'active').length;
-    const incomplete = total - complete;
+    const active = products.filter(p => p.status === 'active').length;
+    const inactive = total - active;
 
-    if (statsComplete) statsComplete.textContent = complete.toLocaleString('ar-SA');
-    if (statsIncomplete) statsIncomplete.textContent = incomplete.toLocaleString('ar-SA');
+    if (statsComplete) statsComplete.textContent = active.toLocaleString('ar-SA');
+    if (statsIncomplete) statsIncomplete.textContent = inactive.toLocaleString('ar-SA');
     if (statsTotal) statsTotal.textContent = total.toLocaleString('ar-SA');
+}
+
+// ===== البحث في المنتجات =====
+function searchProducts(query) {
+    if (!query) {
+        filteredProducts = [...products];
+    } else {
+        query = query.toLowerCase();
+        filteredProducts = products.filter(p =>
+            p.name?.toLowerCase().includes(query) ||
+            p.sku?.toLowerCase().includes(query) ||
+            p.description?.toLowerCase().includes(query)
+        );
+    }
+    currentPage = 1;
+    renderProducts();
 }
 
 // ===== إظهار حالة التحميل =====
@@ -269,7 +385,6 @@ function showNotification(message, type = 'info') {
 function editProduct(productId) {
     const product = products.find(p => p.id == productId);
     if (product) {
-        // احفظ المنتج في localStorage وانتقل لصفحة التعديل
         localStorage.setItem('editProduct', JSON.stringify(product));
         window.location.href = `edit-product.html?id=${productId}`;
     }
@@ -278,8 +393,6 @@ function editProduct(productId) {
 // ===== تحديث سعر منتج =====
 async function updateProductPrice(productId) {
     showNotification('جاري تحديث السعر...', 'info');
-
-    // TODO: إضافة API لتحديث السعر في سلة
     setTimeout(() => {
         showNotification('تم تحديث السعر بنجاح', 'success');
     }, 1500);
@@ -290,7 +403,6 @@ function showVariants(productId) {
     const product = products.find(p => p.id == productId);
     if (product && product.variants) {
         console.log('Variants:', product.variants);
-        // TODO: فتح نافذة المتغيرات
     }
 }
 
@@ -303,12 +415,27 @@ function deleteProduct(productId) {
 
 // ===== ربط الأحداث =====
 document.addEventListener('DOMContentLoaded', function() {
+    // تحميل المنتجات المحفوظة أولاً
+    loadProductsFromStorage();
+
     // ربط زر المزامنة
     if (syncButton) {
         syncButton.addEventListener('click', fetchProducts);
     }
 
-    // إضافة أنيميشن الدوران
+    // ربط أزرار الصفحات
+    const prevBtn = document.querySelector('.pagination-btn:first-child');
+    const nextBtn = document.querySelector('.pagination-btn:last-child');
+    if (prevBtn) prevBtn.addEventListener('click', prevPage);
+    if (nextBtn) nextBtn.addEventListener('click', nextPage);
+
+    // ربط البحث
+    const searchInput = document.querySelector('.search-bar input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => searchProducts(e.target.value));
+    }
+
+    // إضافة أنيميشن
     const style = document.createElement('style');
     style.textContent = `
         @keyframes spin {

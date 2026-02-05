@@ -28,11 +28,7 @@ function roundPrice(price, type) {
 }
 
 // ===== Custom Rules Storage =====
-let customRules = [
-    { id: 1, type: 'exact', enabled: true, exactPrice: 236, newPrice: 239 },
-    { id: 2, type: 'range', enabled: true, rangeFrom: 100, rangeTo: 199, action: 'add', value: 5 },
-    { id: 3, type: 'ending', enabled: false, digits: [1, 2, 3, 4], newDigit: 5, direction: 'up' }
-];
+let customRules = [];
 
 let editingRuleId = null;
 

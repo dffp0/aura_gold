@@ -103,46 +103,46 @@
                         <span class="stat-title">إجمالي المنتجات</span>
                         <div class="stat-icon gold">💍</div>
                     </div>
-                    <div class="stat-value">1,248</div>
+                    <div class="stat-value" id="totalProducts">0</div>
                     <div class="stat-footer">
-                        <span class="stat-badge success">+12%</span>
-                        <span>مقارنة بالشهر الماضي</span>
+                        <span class="stat-badge success">مزامنة</span>
+                        <span>من متجر سلة</span>
                     </div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <span class="stat-title">المنتجات المحدثة اليوم</span>
+                        <span class="stat-title">المنتجات النشطة</span>
                         <div class="stat-icon blue">✓</div>
                     </div>
-                    <div class="stat-value">856</div>
+                    <div class="stat-value" id="activeProducts">0</div>
                     <div class="stat-footer">
-                        <span class="stat-badge success">68.6%</span>
+                        <span class="stat-badge success" id="activePercent">0%</span>
                         <span>من إجمالي المنتجات</span>
                     </div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <span class="stat-title">التحديثات التلقائية</span>
+                        <span class="stat-title">آخر مزامنة</span>
                         <div class="stat-icon green">⚡</div>
                     </div>
-                    <div class="stat-value">15</div>
+                    <div class="stat-value" id="lastSync" style="font-size: 1.2rem;">-</div>
                     <div class="stat-footer">
-                        <span class="stat-badge success">نشط</span>
-                        <span>آخر تحديث: منذ 5 دقائق</span>
+                        <span class="stat-badge success">مربوط</span>
+                        <span>بمنصة سلة</span>
                     </div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <span class="stat-title">متوسط هامش الربح</span>
-                        <div class="stat-icon gold">📊</div>
+                        <span class="stat-title">حالة الاتصال</span>
+                        <div class="stat-icon gold">🔗</div>
                     </div>
-                    <div class="stat-value">23.5%</div>
+                    <div class="stat-value" id="connectionStatus" style="font-size: 1.2rem;">جاري الفحص...</div>
                     <div class="stat-footer">
-                        <span class="stat-badge warning">-1.2%</span>
-                        <span>بسبب ارتفاع الأسعار</span>
+                        <span class="stat-badge" id="connectionBadge">-</span>
+                        <span>السيرفر</span>
                     </div>
                 </div>
             </section>
@@ -231,41 +231,9 @@
             <!-- Recent Updates -->
             <section class="recent-updates-card">
                 <h3 class="section-title">آخر التحديثات</h3>
-                <div class="updates-list">
-                    <div class="update-item">
-                        <div class="update-icon success">✓</div>
-                        <div class="update-content">
-                            <h4>تحديث تلقائي للأسعار</h4>
-                            <p>تم تحديث 856 منتج بنجاح</p>
-                        </div>
-                        <span class="update-time">منذ 5 دقائق</span>
-                    </div>
-
-                    <div class="update-item">
-                        <div class="update-icon info">🔄</div>
-                        <div class="update-content">
-                            <h4>مزامنة مع منصة سلة</h4>
-                            <p>تم سحب 23 منتج جديد</p>
-                        </div>
-                        <span class="update-time">منذ 15 دقيقة</span>
-                    </div>
-
-                    <div class="update-item">
-                        <div class="update-icon warning">⚠️</div>
-                        <div class="update-content">
-                            <h4>تنبيه: ارتفاع سعر الذهب</h4>
-                            <p>سعر الذهب ارتفع بنسبة 2.3% - قد تحتاج لمراجعة هوامش الربح</p>
-                        </div>
-                        <span class="update-time">منذ 30 دقيقة</span>
-                    </div>
-
-                    <div class="update-item">
-                        <div class="update-icon success">📊</div>
-                        <div class="update-content">
-                            <h4>تقرير شهري جاهز</h4>
-                            <p>تقرير يناير 2026 متاح للتحميل</p>
-                        </div>
-                        <span class="update-time">منذ ساعة</span>
+                <div class="updates-list" id="updatesList">
+                    <div class="update-item" style="text-align: center; padding: 2rem;">
+                        <p style="color: #888;">لا توجد تحديثات بعد</p>
                     </div>
                 </div>
             </section>
@@ -273,5 +241,87 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        const API_URL = "https://aura-backend-vdqi.onrender.com";
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            checkConnection();
+            loadUpdates();
+        });
+
+        function loadDashboardData() {
+            const savedProducts = localStorage.getItem('aura_products');
+            const savedTime = localStorage.getItem('aura_products_time');
+
+            if (savedProducts) {
+                const products = JSON.parse(savedProducts);
+                const total = products.length;
+                const active = products.filter(p => p.status === 'active').length;
+                const percent = total > 0 ? Math.round((active / total) * 100) : 0;
+
+                document.getElementById('totalProducts').textContent = total.toLocaleString('ar-SA');
+                document.getElementById('activeProducts').textContent = active.toLocaleString('ar-SA');
+                document.getElementById('activePercent').textContent = percent + '%';
+            }
+
+            if (savedTime) {
+                const time = new Date(savedTime);
+                const now = new Date();
+                const diffMins = Math.floor((now - time) / 60000);
+                let timeText = '';
+                if (diffMins < 60) timeText = `منذ ${diffMins} دقيقة`;
+                else if (diffMins < 1440) timeText = `منذ ${Math.floor(diffMins/60)} ساعة`;
+                else timeText = time.toLocaleDateString('ar-SA');
+                document.getElementById('lastSync').textContent = timeText;
+            }
+        }
+
+        async function checkConnection() {
+            try {
+                const res = await fetch(`${API_URL}/api/health`);
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    document.getElementById('connectionStatus').textContent = 'متصل';
+                    document.getElementById('connectionStatus').style.color = '#10B981';
+                    document.getElementById('connectionBadge').textContent = 'نشط';
+                    document.getElementById('connectionBadge').classList.add('success');
+                }
+            } catch (err) {
+                document.getElementById('connectionStatus').textContent = 'غير متصل';
+                document.getElementById('connectionStatus').style.color = '#EF4444';
+                document.getElementById('connectionBadge').textContent = 'خطأ';
+                document.getElementById('connectionBadge').classList.add('warning');
+            }
+        }
+
+        function loadUpdates() {
+            const history = JSON.parse(localStorage.getItem('aura_sync_history') || '[]');
+            const container = document.getElementById('updatesList');
+
+            if (history.length === 0) return;
+
+            container.innerHTML = history.slice(0, 4).map(item => `
+                <div class="update-item">
+                    <div class="update-icon ${item.status}">${item.status === 'success' ? '✓' : '⚠️'}</div>
+                    <div class="update-content">
+                        <h4>${item.action}</h4>
+                        <p>${item.message}</p>
+                    </div>
+                    <span class="update-time">${formatTime(item.time)}</span>
+                </div>
+            `).join('');
+        }
+
+        function formatTime(timeStr) {
+            const time = new Date(timeStr);
+            const now = new Date();
+            const diffMins = Math.floor((now - time) / 60000);
+            if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+            return time.toLocaleDateString('ar-SA');
+        }
+    </script>
 </body>
 </html>

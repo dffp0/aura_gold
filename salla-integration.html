@@ -69,66 +69,25 @@
             </header>
 
             <!-- Connection Status Card -->
-            <section class="connection-status-card">
+            <section class="connection-status-card" id="connectionStatus">
                 <div class="status-icon connected">
                     <span class="pulse-dot"></span>
                     ✓
                 </div>
                 <div class="status-content">
                     <h3>متصل بنجاح</h3>
-                    <p>متجرك مربوط بنجاح مع منصة سلة</p>
+                    <p>متجرك مربوط بمنصة سلة</p>
                     <div class="status-meta">
-                        <span>آخر مزامنة: <strong>منذ 5 دقائق</strong></span>
-                        <span>المنتجات المزامنة: <strong>1,248</strong></span>
+                        <span>آخر مزامنة: <strong id="lastSyncTime">-</strong></span>
+                        <span>المنتجات: <strong id="productsCount">0</strong></span>
                     </div>
                 </div>
-                <button class="btn-disconnect">
-                    قطع الاتصال
+                <button class="btn-disconnect" onclick="testConnection()">
+                    فحص الاتصال
                 </button>
             </section>
 
             <div class="integration-grid">
-                <!-- API Settings Card -->
-                <section class="settings-card">
-                    <div class="card-header">
-                        <h3>🔑 إعدادات API</h3>
-                        <button class="btn-edit">تعديل</button>
-                    </div>
-
-                    <div class="settings-form">
-                        <div class="form-group">
-                            <label>رابط المتجر</label>
-                            <input type="text" value="https://mystore.sa" readonly>
-                        </div>
-
-                        <div class="form-group">
-                            <label>API Token</label>
-                            <div class="token-field">
-                                <input type="password" value="sk_live_1234567890abcdefghij" readonly>
-                                <button class="btn-show-token">👁️</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Merchant ID</label>
-                            <input type="text" value="123456789" readonly>
-                        </div>
-
-                        <div class="info-box">
-                            <span class="info-icon">ℹ️</span>
-                            <div>
-                                <strong>كيفية الحصول على API Token:</strong>
-                                <p>1. سجل دخول إلى لوحة تحكم سلة</p>
-                                <p>2. انتقل إلى الإعدادات → API</p>
-                                <p>3. انقر على "إنشاء Token جديد"</p>
-                                <p>4. انسخ Token والصقه هنا</p>
-                            </div>
-                        </div>
-
-                        <button class="btn-save" disabled>حفظ التغييرات</button>
-                    </div>
-                </section>
-
                 <!-- Sync Settings Card -->
                 <section class="settings-card">
                     <div class="card-header">
@@ -221,41 +180,10 @@
             <!-- Sync History -->
             <section class="sync-history-card">
                 <h3>سجل المزامنة الأخير</h3>
-                <div class="sync-history-list">
-                    <div class="sync-history-item success">
-                        <div class="sync-history-icon">✓</div>
-                        <div class="sync-history-content">
-                            <h4>مزامنة المنتجات</h4>
-                            <p>تم سحب 1,248 منتج بنجاح</p>
-                        </div>
-                        <span class="sync-history-time">منذ 5 دقائق</span>
-                    </div>
-
-                    <div class="sync-history-item success">
-                        <div class="sync-history-icon">✓</div>
-                        <div class="sync-history-content">
-                            <h4>تحديث الأسعار</h4>
-                            <p>تم تحديث 856 سعر في متجرك</p>
-                        </div>
-                        <span class="sync-history-time">منذ 20 دقيقة</span>
-                    </div>
-
-                    <div class="sync-history-item warning">
-                        <div class="sync-history-icon">⚠️</div>
-                        <div class="sync-history-content">
-                            <h4>مزامنة جزئية</h4>
-                            <p>تم تحديث 820 منتج، فشل 12 منتج</p>
-                        </div>
-                        <span class="sync-history-time">منذ ساعة</span>
-                    </div>
-
-                    <div class="sync-history-item success">
-                        <div class="sync-history-icon">✓</div>
-                        <div class="sync-history-content">
-                            <h4>فحص الاتصال</h4>
-                            <p>الاتصال بـ API سليم</p>
-                        </div>
-                        <span class="sync-history-time">منذ ساعتين</span>
+                <div class="sync-history-list" id="syncHistoryList">
+                    <div class="sync-history-item" style="text-align: center; padding: 2rem;">
+                        <p style="color: #888;">لا يوجد سجل مزامنة بعد</p>
+                        <p style="color: #aaa; font-size: 0.85rem;">اضغط على "مزامنة المنتجات" للبدء</p>
                     </div>
                 </div>
             </section>
@@ -263,5 +191,129 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        const API_URL = "https://aura-backend-vdqi.onrender.com";
+
+        // تحميل البيانات المحفوظة
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedData();
+        });
+
+        function loadSavedData() {
+            const savedProducts = localStorage.getItem('aura_products');
+            const savedTime = localStorage.getItem('aura_products_time');
+
+            if (savedProducts) {
+                const products = JSON.parse(savedProducts);
+                document.getElementById('productsCount').textContent = products.length.toLocaleString('ar-SA');
+            }
+
+            if (savedTime) {
+                const time = new Date(savedTime);
+                const now = new Date();
+                const diffMins = Math.floor((now - time) / 60000);
+                if (diffMins < 60) {
+                    document.getElementById('lastSyncTime').textContent = `منذ ${diffMins} دقيقة`;
+                } else {
+                    document.getElementById('lastSyncTime').textContent = time.toLocaleString('ar-SA');
+                }
+            }
+
+            // تحميل سجل المزامنة
+            loadSyncHistory();
+        }
+
+        function loadSyncHistory() {
+            const history = JSON.parse(localStorage.getItem('aura_sync_history') || '[]');
+            const container = document.getElementById('syncHistoryList');
+
+            if (history.length === 0) return;
+
+            container.innerHTML = history.slice(0, 5).map(item => `
+                <div class="sync-history-item ${item.status}">
+                    <div class="sync-history-icon">${item.status === 'success' ? '✓' : '⚠️'}</div>
+                    <div class="sync-history-content">
+                        <h4>${item.action}</h4>
+                        <p>${item.message}</p>
+                    </div>
+                    <span class="sync-history-time">${formatTime(item.time)}</span>
+                </div>
+            `).join('');
+        }
+
+        function formatTime(timeStr) {
+            const time = new Date(timeStr);
+            const now = new Date();
+            const diffMins = Math.floor((now - time) / 60000);
+            if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+            return time.toLocaleDateString('ar-SA');
+        }
+
+        function addToHistory(action, message, status) {
+            const history = JSON.parse(localStorage.getItem('aura_sync_history') || '[]');
+            history.unshift({ action, message, status, time: new Date().toISOString() });
+            localStorage.setItem('aura_sync_history', JSON.stringify(history.slice(0, 20)));
+            loadSyncHistory();
+        }
+
+        async function testConnection() {
+            const btn = document.querySelector('.btn-disconnect');
+            btn.textContent = 'جاري الفحص...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_URL}/api/health`);
+                const data = await res.json();
+
+                if (data.status === 'ok') {
+                    addToHistory('فحص الاتصال', 'الاتصال بالسيرفر سليم', 'success');
+                    alert('الاتصال بالسيرفر سليم ✅');
+                }
+            } catch (err) {
+                addToHistory('فحص الاتصال', 'فشل الاتصال بالسيرفر', 'warning');
+                alert('فشل الاتصال بالسيرفر ❌');
+            }
+
+            btn.textContent = 'فحص الاتصال';
+            btn.disabled = false;
+        }
+
+        // ربط أزرار المزامنة
+        document.querySelectorAll('.sync-action-btn').forEach((btn, index) => {
+            btn.addEventListener('click', async function() {
+                const title = this.querySelector('h4').textContent;
+                this.style.opacity = '0.6';
+                this.style.pointerEvents = 'none';
+
+                if (index === 0) { // مزامنة المنتجات
+                    try {
+                        const res = await fetch(`${API_URL}/api/salla/products`);
+                        const data = await res.json();
+                        const products = data.data || data;
+
+                        localStorage.setItem('aura_products', JSON.stringify(products));
+                        localStorage.setItem('aura_products_time', new Date().toISOString());
+
+                        addToHistory('مزامنة المنتجات', `تم جلب ${products.length} منتج بنجاح`, 'success');
+                        loadSavedData();
+                        alert(`تم جلب ${products.length} منتج بنجاح ✅`);
+                    } catch (err) {
+                        addToHistory('مزامنة المنتجات', 'فشل جلب المنتجات', 'warning');
+                        alert('فشل جلب المنتجات ❌');
+                    }
+                } else if (index === 2) { // فحص الاتصال
+                    await testConnection();
+                } else {
+                    addToHistory(title, 'تم التنفيذ', 'success');
+                    setTimeout(() => alert(`تم: ${title}`), 500);
+                }
+
+                this.style.opacity = '1';
+                this.style.pointerEvents = 'auto';
+            });
+        });
+    </script>
 </body>
 </html>

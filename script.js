@@ -20,15 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+// فحص الاتصال بالسيرفر (بدون إشعار)
 fetch("https://aura-backend-vdqi.onrender.com/api/health")
   .then(res => res.json())
   .then(data => {
-    console.log("Backend says:", data);
-    alert("الاتصال بالسيرفر تم بنجاح ✅");
+    console.log("Backend connected:", data);
   })
   .catch(err => {
-    console.error(err);
-    alert("فيه مشكلة في الاتصال بالسيرفر ❌");
+    console.error("Backend connection error:", err);
   });
 
 // ===== Select All Checkbox =====

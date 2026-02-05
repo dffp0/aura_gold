@@ -88,19 +88,19 @@
                 <div class="status-grid">
                     <div class="status-item">
                         <span class="status-label">آخر تحديث</span>
-                        <span class="status-value">منذ 3 دقائق</span>
+                        <span class="status-value" id="lastUpdate">-</span>
                     </div>
                     <div class="status-item">
                         <span class="status-label">التحديث القادم</span>
-                        <span class="status-value">بعد 7 دقائق</span>
+                        <span class="status-value">حسب الإعدادات</span>
                     </div>
                     <div class="status-item">
-                        <span class="status-label">عدد التحديثات اليوم</span>
-                        <span class="status-value">15 تحديث</span>
+                        <span class="status-label">عدد المنتجات</span>
+                        <span class="status-value" id="productsCount">0</span>
                     </div>
                     <div class="status-item">
-                        <span class="status-label">معدل النجاح</span>
-                        <span class="status-value success">98.5%</span>
+                        <span class="status-label">حالة الاتصال</span>
+                        <span class="status-value success" id="connectionStatus">-</span>
                     </div>
                 </div>
             </section>
@@ -113,132 +113,20 @@
                         <button class="btn-add-rule">+ إضافة قاعدة</button>
                     </div>
 
-                    <div class="rules-list">
-                        <div class="rule-item active">
-                            <div class="rule-header">
-                                <div class="rule-status">
-                                    <span class="rule-icon">⚡</span>
-                                    <div class="rule-info">
-                                        <h4>تحديث كل 10 دقائق</h4>
-                                        <p>تحديث جميع المنتجات تلقائيًا</p>
-                                    </div>
-                                </div>
-                                <label class="toggle-switch mini">
-                                    <input type="checkbox" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="rule-details">
-                                <div class="rule-setting">
-                                    <span class="setting-label">التكرار:</span>
-                                    <span class="setting-value">كل 10 دقائق</span>
-                                </div>
-                                <div class="rule-setting">
-                                    <span class="setting-label">المنتجات:</span>
-                                    <span class="setting-value">جميع المنتجات (1,248)</span>
-                                </div>
-                                <div class="rule-setting">
-                                    <span class="setting-label">الشروط:</span>
-                                    <span class="setting-value">تحديث دائم</span>
-                                </div>
-                            </div>
-                            <div class="rule-actions">
-                                <button class="btn-rule-action">✏️ تعديل</button>
-                                <button class="btn-rule-action danger">🗑️ حذف</button>
-                            </div>
-                        </div>
-
-                        <div class="rule-item">
-                            <div class="rule-header">
-                                <div class="rule-status">
-                                    <span class="rule-icon">📊</span>
-                                    <div class="rule-info">
-                                        <h4>تحديث عند تغير السعر بنسبة 2%</h4>
-                                        <p>منتجات عيار 21 فقط</p>
-                                    </div>
-                                </div>
-                                <label class="toggle-switch mini">
-                                    <input type="checkbox">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="rule-details">
-                                <div class="rule-setting">
-                                    <span class="setting-label">الشرط:</span>
-                                    <span class="setting-value">تغير السعر ≥ 2%</span>
-                                </div>
-                                <div class="rule-setting">
-                                    <span class="setting-label">المنتجات:</span>
-                                    <span class="setting-value">عيار 21 (856 منتج)</span>
-                                </div>
-                                <div class="rule-setting">
-                                    <span class="setting-label">الإجراء:</span>
-                                    <span class="setting-value">تحديث فوري</span>
-                                </div>
-                            </div>
-                            <div class="rule-actions">
-                                <button class="btn-rule-action">✏️ تعديل</button>
-                                <button class="btn-rule-action danger">🗑️ حذف</button>
-                            </div>
+                    <div class="rules-list" id="automationRules">
+                        <div style="text-align: center; padding: 2rem; color: #888;">
+                            <p>لا توجد قواعد تحديث بعد</p>
+                            <p style="font-size: 0.85rem;">اضغط على "إضافة قاعدة" لإنشاء قاعدة جديدة</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- Pricing Formula -->
-                <section class="pricing-formula-card">
-                    <div class="card-header">
-                        <h3>💰 معادلة التسعير</h3>
-                    </div>
-
-                    <div class="formula-visual">
-                        <div class="formula-box">
-                            <span class="formula-label">سعر الذهب</span>
-                            <span class="formula-value">338.87 ر.س</span>
-                        </div>
-                        <span class="formula-operator">×</span>
-                        <div class="formula-box">
-                            <span class="formula-label">الوزن</span>
-                            <span class="formula-value">5.2 جم</span>
-                        </div>
-                        <span class="formula-operator">+</span>
-                        <div class="formula-box">
-                            <span class="formula-label">هامش الربح</span>
-                            <span class="formula-value">20%</span>
-                        </div>
-                        <span class="formula-operator">=</span>
-                        <div class="formula-box result">
-                            <span class="formula-label">السعر النهائي</span>
-                            <span class="formula-value">2,113 ر.س</span>
-                        </div>
-                    </div>
-
-                    <div class="formula-settings">
-                        <div class="form-group">
-                            <label>هامش الربح الافتراضي (%)</label>
-                            <input type="number" value="20" min="0" max="100">
-                        </div>
-
-                        <div class="form-group">
-                            <label>رسوم إضافية (ثابتة)</label>
-                            <input type="number" value="0" placeholder="مثال: 50 ر.س">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" checked>
-                                <span>تقريب الأسعار إلى أقرب 5 ريال</span>
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox">
-                                <span>إضافة رسوم VAT (15%)</span>
-                            </label>
-                        </div>
-
-                        <button class="btn-save-primary">حفظ المعادلة</button>
-                    </div>
+                <!-- Quick Link to Pricing -->
+                <section class="pricing-formula-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center;">
+                    <span style="font-size: 3rem; margin-bottom: 1rem;">💰</span>
+                    <h3 style="margin-bottom: 0.5rem;">معادلة التسعير</h3>
+                    <p style="color: #666; margin-bottom: 1.5rem;">إعدادات حساب الأسعار والتقريب والقواعد المخصصة</p>
+                    <a href="pricing.html" class="btn-save-primary" style="text-decoration: none;">الذهاب لإعدادات التسعير</a>
                 </section>
             </div>
 
@@ -347,5 +235,49 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        const API_URL = "https://aura-backend-vdqi.onrender.com";
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            checkConnection();
+        });
+
+        function loadData() {
+            const savedProducts = localStorage.getItem('aura_products');
+            const savedTime = localStorage.getItem('aura_products_time');
+
+            if (savedProducts) {
+                const products = JSON.parse(savedProducts);
+                document.getElementById('productsCount').textContent = products.length.toLocaleString('ar-SA');
+            }
+
+            if (savedTime) {
+                const time = new Date(savedTime);
+                const now = new Date();
+                const diffMins = Math.floor((now - time) / 60000);
+                let timeText = '';
+                if (diffMins < 60) timeText = `منذ ${diffMins} دقيقة`;
+                else if (diffMins < 1440) timeText = `منذ ${Math.floor(diffMins/60)} ساعة`;
+                else timeText = time.toLocaleDateString('ar-SA');
+                document.getElementById('lastUpdate').textContent = timeText;
+            }
+        }
+
+        async function checkConnection() {
+            try {
+                const res = await fetch(`${API_URL}/api/health`);
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    document.getElementById('connectionStatus').textContent = 'متصل';
+                    document.getElementById('connectionStatus').classList.add('success');
+                }
+            } catch (err) {
+                document.getElementById('connectionStatus').textContent = 'غير متصل';
+                document.getElementById('connectionStatus').classList.remove('success');
+                document.getElementById('connectionStatus').style.color = '#EF4444';
+            }
+        }
+    </script>
 </body>
 </html>

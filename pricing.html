@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات التسعير | AuraPrice</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="pricing.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>
+                    <span class="logo-icon">✦</span>
+                    AuraPrice
+                </h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>لوحة التحكم</span>
+                </a>
+                <a href="products.html" class="nav-item">
+                    <span class="nav-icon">💍</span>
+                    <span>إدارة المنتجات</span>
+                </a>
+                <a href="pricing.html" class="nav-item active">
+                    <span class="nav-icon">💰</span>
+                    <span>إعدادات التسعير</span>
+                </a>
+                <a href="salla-integration.html" class="nav-item">
+                    <span class="nav-icon">🔗</span>
+                    <span>ربط منصة سلة</span>
+                </a>
+                <a href="automation.html" class="nav-item">
+                    <span class="nav-icon">⚡</span>
+                    <span>التحديث التلقائي</span>
+                </a>
+                <a href="reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>التقارير</span>
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span>الإعدادات</span>
+                </a>
+                <a href="index.html" class="nav-item" style="margin-top: 2rem; color: #EF4444;">
+                    <span class="nav-icon">🚪</span>
+                    <span>تسجيل الخروج</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <h1>إعدادات التسعير 💰</h1>
+                    <p>تخصيص طريقة حساب وتقريب الأسعار</p>
+                </div>
+            </header>
+
+            <!-- Price Rounding Section -->
+            <section class="pricing-card">
+                <div class="card-header">
+                    <h3>🔢 تقريب الأسعار</h3>
+                    <span class="card-badge">أساسي</span>
+                </div>
+
+                <div class="rounding-options">
+                    <div class="rounding-option">
+                        <label class="radio-label">
+                            <input type="radio" name="roundingType" value="none">
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <h4>بدون تقريب</h4>
+                                <p>الإبقاء على السعر كما هو (مثال: 100.40 ← 100.40)</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="rounding-option">
+                        <label class="radio-label">
+                            <input type="radio" name="roundingType" value="ceiling" checked>
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <h4>تقريب لأعلى (Ceiling)</h4>
+                                <p>تقريب السعر لأعلى رقم صحيح (مثال: 100.40 ← 101)</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="rounding-option">
+                        <label class="radio-label">
+                            <input type="radio" name="roundingType" value="floor">
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <h4>تقريب لأسفل (Floor)</h4>
+                                <p>تقريب السعر لأدنى رقم صحيح (مثال: 100.60 ← 100)</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="rounding-option">
+                        <label class="radio-label">
+                            <input type="radio" name="roundingType" value="nearest">
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <h4>تقريب لأقرب رقم صحيح</h4>
+                                <p>تقريب السعر لأقرب رقم (مثال: 100.40 ← 100، 100.60 ← 101)</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="rounding-option">
+                        <label class="radio-label">
+                            <input type="radio" name="roundingType" value="nearest5">
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <h4>تقريب لأقرب 5</h4>
+                                <p>تقريب السعر لأقرب رقم من مضاعفات 5 (مثال: 103 ← 105)</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="rounding-option">
+                        <label class="radio-label">
+                            <input type="radio" name="roundingType" value="nearest10">
+                            <span class="radio-custom"></span>
+                            <div class="option-content">
+                                <h4>تقريب لأقرب 10</h4>
+                                <p>تقريب السعر لأقرب رقم من مضاعفات 10 (مثال: 106 ← 110)</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Live Preview -->
+                <div class="rounding-preview">
+                    <h4>معاينة مباشرة</h4>
+                    <div class="preview-box">
+                        <div class="preview-item">
+                            <span class="preview-label">السعر الأصلي:</span>
+                            <input type="number" id="previewOriginalPrice" value="236.45" step="0.01" class="preview-input">
+                        </div>
+                        <span class="preview-arrow">←</span>
+                        <div class="preview-item result">
+                            <span class="preview-label">السعر بعد التقريب:</span>
+                            <span id="previewRoundedPrice" class="preview-value">237</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-save-primary" onclick="saveRoundingSettings()">حفظ إعدادات التقريب</button>
+            </section>
+
+            <!-- Custom Pricing Rules Section -->
+            <section class="pricing-card">
+                <div class="card-header">
+                    <h3>⚙️ قواعد التسعير المخصصة</h3>
+                    <span class="card-badge premium">متقدم</span>
+                </div>
+
+                <div class="custom-rules-description">
+                    <p>أنشئ قواعد مخصصة لتحويل الأسعار. مثال: إذا كان السعر 236 يتحول إلى 239</p>
+                </div>
+
+                <!-- Rule Type Selection -->
+                <div class="rule-type-selector">
+                    <button class="rule-type-btn active" data-type="exact">قاعدة محددة</button>
+                    <button class="rule-type-btn" data-type="range">نطاق سعري</button>
+                    <button class="rule-type-btn" data-type="ending">أرقام النهاية</button>
+                </div>
+
+                <!-- Rules List -->
+                <div class="custom-rules-list" id="customRulesList">
+                    <!-- Example Rule 1 -->
+                    <div class="custom-rule-item" data-rule-id="1">
+                        <div class="rule-content">
+                            <div class="rule-type-badge exact">قاعدة محددة</div>
+                            <div class="rule-details">
+                                <span class="rule-condition">إذا كان السعر = <strong>236</strong></span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-action">يصبح <strong>239</strong></span>
+                            </div>
+                        </div>
+                        <div class="rule-actions">
+                            <label class="toggle-switch mini">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <button class="btn-rule-edit" onclick="editRule(1)">✏️</button>
+                            <button class="btn-rule-delete" onclick="deleteRule(1)">🗑️</button>
+                        </div>
+                    </div>
+
+                    <!-- Example Rule 2 -->
+                    <div class="custom-rule-item" data-rule-id="2">
+                        <div class="rule-content">
+                            <div class="rule-type-badge range">نطاق سعري</div>
+                            <div class="rule-details">
+                                <span class="rule-condition">إذا كان السعر من <strong>100</strong> إلى <strong>199</strong></span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-action">أضف <strong>+5</strong> ريال</span>
+                            </div>
+                        </div>
+                        <div class="rule-actions">
+                            <label class="toggle-switch mini">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <button class="btn-rule-edit" onclick="editRule(2)">✏️</button>
+                            <button class="btn-rule-delete" onclick="deleteRule(2)">🗑️</button>
+                        </div>
+                    </div>
+
+                    <!-- Example Rule 3 -->
+                    <div class="custom-rule-item" data-rule-id="3">
+                        <div class="rule-content">
+                            <div class="rule-type-badge ending">أرقام النهاية</div>
+                            <div class="rule-details">
+                                <span class="rule-condition">إذا انتهى السعر بـ <strong>1, 2, 3, 4</strong></span>
+                                <span class="rule-arrow">→</span>
+                                <span class="rule-action">قرّب لأعلى إلى <strong>5</strong></span>
+                            </div>
+                        </div>
+                        <div class="rule-actions">
+                            <label class="toggle-switch mini">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <button class="btn-rule-edit" onclick="editRule(3)">✏️</button>
+                            <button class="btn-rule-delete" onclick="deleteRule(3)">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add New Rule Button -->
+                <button class="btn-add-rule" onclick="openAddRuleModal()">
+                    <span>+</span>
+                    إضافة قاعدة جديدة
+                </button>
+            </section>
+
+            <!-- Rules Priority Section -->
+            <section class="pricing-card">
+                <div class="card-header">
+                    <h3>📋 ترتيب تطبيق القواعد</h3>
+                </div>
+                <div class="priority-info">
+                    <p>يتم تطبيق القواعد بالترتيب التالي:</p>
+                    <ol class="priority-list">
+                        <li><strong>القواعد المخصصة المحددة</strong> - تُطبق أولاً إذا تطابق السعر</li>
+                        <li><strong>قواعد النطاق السعري</strong> - تُطبق إذا كان السعر ضمن النطاق</li>
+                        <li><strong>قواعد أرقام النهاية</strong> - تُطبق على الرقم الأخير</li>
+                        <li><strong>التقريب العام</strong> - يُطبق أخيراً على النتيجة النهائية</li>
+                    </ol>
+                </div>
+                <div class="priority-toggle">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="applyRulesBeforeRounding" checked>
+                        <span>تطبيق القواعد المخصصة قبل التقريب العام</span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Test Calculator -->
+            <section class="pricing-card">
+                <div class="card-header">
+                    <h3>🧮 اختبار الأسعار</h3>
+                </div>
+                <div class="test-calculator">
+                    <div class="test-input-group">
+                        <label>أدخل السعر للاختبار:</label>
+                        <input type="number" id="testPrice" placeholder="مثال: 236.45" step="0.01">
+                        <button class="btn-calculate" onclick="calculateTestPrice()">احسب</button>
+                    </div>
+                    <div class="test-results" id="testResults" style="display: none;">
+                        <div class="test-result-item">
+                            <span class="result-label">السعر الأصلي:</span>
+                            <span class="result-value" id="resultOriginal">-</span>
+                        </div>
+                        <div class="test-result-item">
+                            <span class="result-label">بعد القواعد المخصصة:</span>
+                            <span class="result-value" id="resultAfterRules">-</span>
+                        </div>
+                        <div class="test-result-item highlight">
+                            <span class="result-label">السعر النهائي:</span>
+                            <span class="result-value" id="resultFinal">-</span>
+                        </div>
+                        <div class="applied-rules" id="appliedRules">
+                            <h5>القواعد المُطبقة:</h5>
+                            <ul id="appliedRulesList"></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Rule Modal -->
+    <div id="ruleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="ruleModalTitle">إضافة قاعدة جديدة</h2>
+                <button class="modal-close" onclick="closeRuleModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Rule Type Selection -->
+                <div class="modal-form-group">
+                    <label>نوع القاعدة</label>
+                    <select id="modalRuleType" onchange="updateRuleForm()">
+                        <option value="exact">قاعدة محددة (سعر معين)</option>
+                        <option value="range">نطاق سعري (من - إلى)</option>
+                        <option value="ending">أرقام النهاية</option>
+                    </select>
+                </div>
+
+                <!-- Exact Rule Form -->
+                <div id="exactRuleForm" class="rule-form">
+                    <div class="modal-form-grid">
+                        <div class="modal-form-group">
+                            <label>إذا كان السعر يساوي</label>
+                            <input type="number" id="exactPrice" placeholder="مثال: 236" step="1">
+                        </div>
+                        <div class="modal-form-group">
+                            <label>يتحول إلى</label>
+                            <input type="number" id="exactNewPrice" placeholder="مثال: 239" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Range Rule Form -->
+                <div id="rangeRuleForm" class="rule-form" style="display: none;">
+                    <div class="modal-form-grid">
+                        <div class="modal-form-group">
+                            <label>من سعر</label>
+                            <input type="number" id="rangeFrom" placeholder="مثال: 100" step="1">
+                        </div>
+                        <div class="modal-form-group">
+                            <label>إلى سعر</label>
+                            <input type="number" id="rangeTo" placeholder="مثال: 199" step="1">
+                        </div>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>الإجراء</label>
+                        <select id="rangeAction">
+                            <option value="add">إضافة مبلغ ثابت</option>
+                            <option value="subtract">خصم مبلغ ثابت</option>
+                            <option value="percentage">إضافة نسبة مئوية</option>
+                            <option value="set">تحديد سعر ثابت</option>
+                        </select>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>القيمة</label>
+                        <input type="number" id="rangeValue" placeholder="مثال: 5" step="0.01">
+                    </div>
+                </div>
+
+                <!-- Ending Rule Form -->
+                <div id="endingRuleForm" class="rule-form" style="display: none;">
+                    <div class="modal-form-group">
+                        <label>إذا انتهى السعر بـ (اختر الأرقام)</label>
+                        <div class="ending-digits">
+                            <label class="digit-checkbox"><input type="checkbox" value="0"><span>0</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="1"><span>1</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="2"><span>2</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="3"><span>3</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="4"><span>4</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="5"><span>5</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="6"><span>6</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="7"><span>7</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="8"><span>8</span></label>
+                            <label class="digit-checkbox"><input type="checkbox" value="9"><span>9</span></label>
+                        </div>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>يتحول الرقم الأخير إلى</label>
+                        <select id="endingNewDigit">
+                            <option value="0">0</option>
+                            <option value="5">5</option>
+                            <option value="9">9</option>
+                        </select>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>اتجاه التقريب</label>
+                        <select id="endingDirection">
+                            <option value="up">لأعلى</option>
+                            <option value="down">لأسفل</option>
+                            <option value="nearest">لأقرب</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="modal-btn-cancel" onclick="closeRuleModal()">إلغاء</button>
+                <button class="modal-btn-save" onclick="saveRule()">حفظ القاعدة</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="pricing.js"></script>
+</body>
+</html>

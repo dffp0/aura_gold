@@ -69,28 +69,28 @@
                     <div class="gold-prices-ticker">
                         <div class="price-ticker-item">
                             <span class="ticker-label">عيار 24</span>
-                            <span class="ticker-price">375.20</span>
+                            <span class="ticker-price" id="ticker-24k">--</span>
                         </div>
                         <div class="price-ticker-item">
                             <span class="ticker-label">عيار 22</span>
-                            <span class="ticker-price">343.93</span>
+                            <span class="ticker-price" id="ticker-22k">--</span>
                         </div>
                         <div class="price-ticker-item main">
                             <span class="ticker-label">عيار 21</span>
-                            <span class="ticker-price">328.30</span>
-                            <span class="price-change">↑ 2.3%</span>
+                            <span class="ticker-price" id="ticker-21k">--</span>
+                            <span class="price-change" id="ticker-change">--</span>
                         </div>
                         <div class="price-ticker-item">
                             <span class="ticker-label">عيار 18</span>
-                            <span class="ticker-price">281.40</span>
+                            <span class="ticker-price" id="ticker-18k">--</span>
                         </div>
                         <div class="price-ticker-item">
                             <span class="ticker-label">عيار 14</span>
-                            <span class="ticker-price">218.87</span>
+                            <span class="ticker-price" id="ticker-14k">--</span>
                         </div>
                         <div class="price-ticker-item silver">
                             <span class="ticker-label">الفضة</span>
-                            <span class="ticker-price">3.85</span>
+                            <span class="ticker-price" id="ticker-silver">--</span>
                         </div>
                     </div>
                 </div>
@@ -213,15 +213,15 @@
                         <div class="chart-stats">
                             <div class="chart-stat">
                                 <span class="chart-stat-label">الحد الأدنى</span>
-                                <span class="chart-stat-value">332.50 ر.س</span>
+                                <span class="chart-stat-value" id="chart-min">-- ر.س</span>
                             </div>
                             <div class="chart-stat">
                                 <span class="chart-stat-label">الحد الأقصى</span>
-                                <span class="chart-stat-value">341.20 ر.س</span>
+                                <span class="chart-stat-value" id="chart-max">-- ر.س</span>
                             </div>
                             <div class="chart-stat">
-                                <span class="chart-stat-label">المتوسط</span>
-                                <span class="chart-stat-value">336.85 ر.س</span>
+                                <span class="chart-stat-label">السعر الحالي</span>
+                                <span class="chart-stat-value" id="chart-current">-- ر.س</span>
                             </div>
                         </div>
                     </div>
@@ -243,12 +243,146 @@
     <script src="script.js"></script>
     <script>
         const API_URL = "https://aura-backend-vdqi.onrender.com";
+        const CARAT_MULTIPLIERS = { '24': 1, '22': 0.9167, '21': 0.875, '18': 0.75, '14': 0.583 };
 
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardData();
             checkConnection();
             loadUpdates();
+            fetchLiveGoldPrice();
+            fetchLiveSilverPrice();
         });
+
+        // ===== جلب سعر الذهب الحي =====
+        async function fetchLiveGoldPrice() {
+            // عرض آخر سعر محفوظ فوراً أثناء الجلب
+            const savedPrice = localStorage.getItem('aura_gold_price');
+            if (savedPrice) {
+                updateGoldTicker(parseFloat(savedPrice));
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/api/gold-price`);
+                const data = await res.json();
+                let price24k = 0;
+
+                if (data.price_gram_24k) {
+                    price24k = data.price_gram_24k;
+                } else if (data.price) {
+                    price24k = data.price / 31.1035;
+                }
+
+                if (price24k > 0) {
+                    // حفظ السعر
+                    localStorage.setItem('aura_gold_price', price24k);
+                    localStorage.setItem('aura_gold_price_time', new Date().toISOString());
+
+                    // حفظ في سجل الأسعار
+                    savePriceHistory(price24k);
+
+                    // تحديث العرض
+                    updateGoldTicker(price24k);
+                    updateChartStats(price24k);
+                }
+            } catch (error) {
+                console.error('خطأ في جلب سعر الذهب:', error);
+            }
+        }
+
+        // ===== جلب سعر الفضة =====
+        async function fetchLiveSilverPrice() {
+            const savedSilver = localStorage.getItem('aura_silver_price');
+            if (savedSilver) {
+                const el = document.getElementById('ticker-silver');
+                if (el) el.textContent = parseFloat(savedSilver).toFixed(2);
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/api/silver-price`);
+                const data = await res.json();
+                let silverPrice = 0;
+
+                if (data.price_gram_24k) {
+                    silverPrice = data.price_gram_24k;
+                } else if (data.price) {
+                    silverPrice = data.price / 31.1035;
+                }
+
+                if (silverPrice > 0) {
+                    localStorage.setItem('aura_silver_price', silverPrice);
+                    const el = document.getElementById('ticker-silver');
+                    if (el) el.textContent = silverPrice.toFixed(2);
+                }
+            } catch (error) {
+                console.error('خطأ في جلب سعر الفضة:', error);
+            }
+        }
+
+        // ===== تحديث شريط الأسعار =====
+        function updateGoldTicker(price24k) {
+            const prices = {
+                '24k': price24k,
+                '22k': price24k * CARAT_MULTIPLIERS['22'],
+                '21k': price24k * CARAT_MULTIPLIERS['21'],
+                '18k': price24k * CARAT_MULTIPLIERS['18'],
+                '14k': price24k * CARAT_MULTIPLIERS['14']
+            };
+
+            Object.entries(prices).forEach(([key, val]) => {
+                const el = document.getElementById(`ticker-${key}`);
+                if (el) el.textContent = val.toFixed(2);
+            });
+
+            // حساب نسبة التغير (مقارنة بآخر سعر مسجل)
+            const history = JSON.parse(localStorage.getItem('aura_price_history') || '[]');
+            if (history.length >= 2) {
+                const prevPrice = history[history.length - 2].price;
+                const changePercent = ((price24k - prevPrice) / prevPrice * 100).toFixed(1);
+                const changeEl = document.getElementById('ticker-change');
+                if (changeEl) {
+                    changeEl.textContent = `${changePercent >= 0 ? '↑' : '↓'} ${Math.abs(changePercent)}%`;
+                    changeEl.style.color = changePercent >= 0 ? '#10B981' : '#EF4444';
+                }
+            }
+        }
+
+        // ===== حفظ سجل الأسعار =====
+        function savePriceHistory(price24k) {
+            const history = JSON.parse(localStorage.getItem('aura_price_history') || '[]');
+            const now = new Date();
+
+            // لا نحفظ إذا آخر سجل أقل من ساعة
+            if (history.length > 0) {
+                const lastTime = new Date(history[history.length - 1].time);
+                if ((now - lastTime) < 3600000) return;
+            }
+
+            history.push({ price: price24k, time: now.toISOString() });
+
+            // نحتفظ بآخر 30 سجل
+            if (history.length > 30) history.shift();
+
+            localStorage.setItem('aura_price_history', JSON.stringify(history));
+        }
+
+        // ===== تحديث إحصائيات الرسم البياني =====
+        function updateChartStats(currentPrice) {
+            const history = JSON.parse(localStorage.getItem('aura_price_history') || '[]');
+            const prices = history.map(h => h.price);
+
+            if (prices.length === 0) prices.push(currentPrice);
+
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+
+            const minEl = document.getElementById('chart-min');
+            const maxEl = document.getElementById('chart-max');
+            const currentEl = document.getElementById('chart-current');
+
+            if (minEl) minEl.textContent = `${min.toFixed(2)} ر.س`;
+            if (maxEl) maxEl.textContent = `${max.toFixed(2)} ر.س`;
+            if (currentEl) currentEl.textContent = `${currentPrice.toFixed(2)} ر.س`;
+        }
 
         function loadDashboardData() {
             const savedProducts = localStorage.getItem('aura_products');
@@ -257,7 +391,7 @@
             if (savedProducts) {
                 const products = JSON.parse(savedProducts);
                 const total = products.length;
-                const active = products.filter(p => p.status === 'active').length;
+                const active = products.filter(p => p.status === 'sale' || p.status === 'active').length;
                 const percent = total > 0 ? Math.round((active / total) * 100) : 0;
 
                 document.getElementById('totalProducts').textContent = total.toLocaleString('ar-SA');

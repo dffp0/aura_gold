@@ -296,7 +296,14 @@ function openEditModal(productId) {
             });
         }
 
-        variantsList.innerHTML = product.skus.map((sku, index) => {
+        // زر إعادة حساب أسعار جميع المتغيرات
+        let variantsHTML = `
+            <button onclick="recalcAllVariantPrices('${product.id}')" style="width: 100%; padding: 0.5rem; margin-bottom: 0.75rem; background: linear-gradient(135deg, #D4AF37, #F5D060); color: #0F3460; border: none; border-radius: 8px; font-family: 'Cairo', sans-serif; font-weight: 700; cursor: pointer;">
+                🧮 إعادة حساب أسعار جميع المتغيرات
+            </button>
+        `;
+
+        variantsHTML += product.skus.map((sku, index) => {
             const skuPrice = sku.price?.amount || 0;
             const skuSku = sku.sku || '-';
             const skuWeight = sku.weight || '-';
@@ -314,19 +321,24 @@ function openEditModal(productId) {
             if (!skuName) skuName = `متغير ${index + 1}`;
 
             return `
-                <div class="variant-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 8px; margin-bottom: 0.5rem;">
-                    <div style="flex: 1;">
+                <div class="variant-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 8px; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div style="flex: 1; min-width: 150px;">
                         <strong style="color: #D4AF37;">${skuName}</strong>
                         <div style="font-size: 0.8rem; color: #888; margin-top: 4px;">
                             SKU: ${skuSku} | الوزن: ${skuWeightLabel} | المخزون: ${skuStock}
                         </div>
                     </div>
-                    <div style="font-weight: 700; color: #0F3460;">
-                        ${parseFloat(skuPrice).toLocaleString('ar-SA')} ر.س
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="number" id="sku-price-${sku.id}" value="${skuPrice}" step="1" min="0"
+                            data-sku-id="${sku.id}" data-weight="${sku.weight || 0}"
+                            style="width: 120px; padding: 0.4rem 0.6rem; border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 6px; text-align: center; font-family: 'Cairo', sans-serif; font-weight: 700; color: #0F3460; background: white;">
+                        <span style="color: #888; font-size: 0.85rem;">ر.س</span>
                     </div>
                 </div>
             `;
         }).join('');
+
+        variantsList.innerHTML = variantsHTML;
     } else if (variantsSection) {
         variantsSection.style.display = 'none';
     }
@@ -354,6 +366,7 @@ function saveProduct() {
     const productId = modal?.dataset.productId;
     if (!productId) return;
 
+    const product = products.find(p => p.id == productId);
     const carat = document.getElementById('modalCarat')?.value || '';
     const craftsmanship = document.getElementById('modalCraftsmanship')?.value || '0';
     const additionalPrice = document.getElementById('modalAdditionalPrice')?.value || '0';
@@ -364,6 +377,40 @@ function saveProduct() {
     localStorage.setItem(`product_craftsmanship_${productId}`, craftsmanship);
     localStorage.setItem(`product_additional_${productId}`, additionalPrice);
     localStorage.setItem(`product_profit_${productId}`, profitMargin);
+
+    // حساب وتحديث السعر النهائي محلياً
+    if (product && carat) {
+        const basePrice = currentGoldPrice || 338.87;
+        const caratMultipliers = { '24': 1, '22': 0.9167, '21': 0.875, '18': 0.75, '14': 0.583 };
+        const multiplier = caratMultipliers[carat] || 1;
+        const weight = extractWeight(product) || 0;
+        const goldTotal = weight * basePrice * multiplier;
+        const subtotal = goldTotal + parseFloat(craftsmanship) + parseFloat(additionalPrice);
+        const profit = subtotal * (parseFloat(profitMargin) / 100);
+        const finalPrice = Math.round(subtotal + profit);
+
+        // تحديث السعر في الكائن
+        if (product.price && typeof product.price === 'object') {
+            product.price.amount = finalPrice;
+        } else {
+            product.price = { amount: finalPrice, currency: 'SAR' };
+        }
+
+        // تحديث أسعار المتغيرات من الحقول المعدلة يدوياً
+        if (product.skus && product.skus.length > 0) {
+            product.skus.forEach(sku => {
+                const skuInput = document.getElementById(`sku-price-${sku.id}`);
+                if (skuInput) {
+                    const skuPrice = parseFloat(skuInput.value) || 0;
+                    if (skuPrice > 0) {
+                        sku.price = { amount: skuPrice, currency: 'SAR' };
+                    }
+                }
+            });
+        }
+
+        saveProductsToStorage();
+    }
 
     showNotification('تم حفظ التعديلات بنجاح', 'success');
     closeEditModal();
@@ -427,6 +474,39 @@ function updatePriceCalculation() {
             </div>
         `;
     }
+}
+
+// ===== إعادة حساب أسعار جميع المتغيرات =====
+function recalcAllVariantPrices(productId) {
+    const product = products.find(p => p.id == productId);
+    if (!product || !product.skus) return;
+
+    const carat = document.getElementById('modalCarat')?.value || '';
+    const craftsmanship = parseFloat(document.getElementById('modalCraftsmanship')?.value) || 0;
+    const additionalPrice = parseFloat(document.getElementById('modalAdditionalPrice')?.value) || 0;
+    const profitMargin = parseFloat(document.getElementById('modalProfitMargin')?.value) || 0;
+
+    if (!carat) {
+        showNotification('حدد العيار أولاً', 'error');
+        return;
+    }
+
+    const basePrice = currentGoldPrice || 338.87;
+    const caratMultipliers = { '24': 1, '22': 0.9167, '21': 0.875, '18': 0.75, '14': 0.583 };
+    const multiplier = caratMultipliers[carat] || 1;
+
+    product.skus.forEach(sku => {
+        const weight = sku.weight || extractWeight(product) || 0;
+        const goldTotal = weight * basePrice * multiplier;
+        const subtotal = goldTotal + craftsmanship + additionalPrice;
+        const profit = subtotal * (profitMargin / 100);
+        const finalPrice = Math.round(subtotal + profit);
+
+        const input = document.getElementById(`sku-price-${sku.id}`);
+        if (input) input.value = finalPrice;
+    });
+
+    showNotification('تم إعادة حساب أسعار المتغيرات', 'success');
 }
 
 // ===== تسجيل العيار التلقائي =====
@@ -679,49 +759,82 @@ async function updateProductPrice(productId) {
         return;
     }
 
-    showNotification('جاري تحديث السعر...', 'info');
+    showNotification('جاري تحديث السعر في سلة...', 'info');
 
     try {
-        // حساب السعر الجديد
         const basePrice = currentGoldPrice || 338.87;
         const caratMultipliers = { '24': 1, '22': 0.9167, '21': 0.875, '18': 0.75, '14': 0.583 };
         const multiplier = caratMultipliers[savedCarat] || 1;
 
-        // إذا المنتج عنده SKUs (متغيرات)، نحدث كل SKU بسعره
         if (product.skus && product.skus.length > 0) {
+            // منتج بمتغيرات: نحدث كل SKU
             let updatedCount = 0;
+            let errors = [];
+
             for (const sku of product.skus) {
-                const weight = sku.weight || extractWeight(product) || 0;
-                const goldTotal = weight * basePrice * multiplier;
-                const subtotal = goldTotal + savedCraftsmanship + savedAdditionalPrice;
-                const profit = subtotal * (savedProfitMargin / 100);
-                const finalPrice = Math.round(subtotal + profit);
+                // نأخذ السعر من حقل الإدخال إن كان مفتوح، وإلا نحسبه
+                const skuInput = document.getElementById(`sku-price-${sku.id}`);
+                let finalPrice;
 
-                const response = await fetch(`${API_URL}/api/salla/products/${productId}/skus/${sku.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ price: finalPrice })
-                });
+                if (skuInput && parseFloat(skuInput.value) > 0) {
+                    finalPrice = Math.round(parseFloat(skuInput.value));
+                } else {
+                    const weight = sku.weight || extractWeight(product) || 0;
+                    const goldTotal = weight * basePrice * multiplier;
+                    const subtotal = goldTotal + savedCraftsmanship + savedAdditionalPrice;
+                    const profit = subtotal * (savedProfitMargin / 100);
+                    finalPrice = Math.round(subtotal + profit);
+                }
 
-                const result = await response.json();
-                if (result.status === 200 || result.success) {
-                    updatedCount++;
-                    // تحديث السعر محلياً
-                    sku.price = { amount: finalPrice, currency: 'SAR' };
+                console.log(`تحديث SKU ${sku.id} بسعر ${finalPrice}...`);
+
+                try {
+                    const response = await fetch(`${API_URL}/api/salla/products/${productId}/skus/${sku.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ price: finalPrice })
+                    });
+
+                    const result = await response.json();
+                    console.log(`رد سلة SKU ${sku.id}:`, result);
+
+                    if (response.ok || result.status === 200 || result.success) {
+                        updatedCount++;
+                        sku.price = { amount: finalPrice, currency: 'SAR' };
+                    } else {
+                        errors.push(`SKU ${sku.id}: ${result.error?.message || JSON.stringify(result)}`);
+                    }
+                } catch (skuError) {
+                    errors.push(`SKU ${sku.id}: ${skuError.message}`);
                 }
             }
-            // تحديث سعر المنتج الأساسي بسعر أول SKU
-            const firstSkuPrice = product.skus[0].price?.amount || 0;
-            await fetch(`${API_URL}/api/salla/products/${productId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ price: firstSkuPrice })
-            });
-            product.price = { amount: firstSkuPrice, currency: 'SAR' };
 
+            // تحديث سعر المنتج الأساسي
+            const mainPrice = product.skus[0].price?.amount || 0;
+            console.log(`تحديث سعر المنتج الأساسي إلى ${mainPrice}...`);
+
+            try {
+                const mainRes = await fetch(`${API_URL}/api/salla/products/${productId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: mainPrice })
+                });
+                const mainResult = await mainRes.json();
+                console.log('رد سلة المنتج الأساسي:', mainResult);
+            } catch (mainErr) {
+                console.error('خطأ في تحديث السعر الأساسي:', mainErr);
+            }
+
+            product.price = { amount: mainPrice, currency: 'SAR' };
             saveProductsToStorage();
             renderProducts();
-            showNotification(`تم تحديث ${updatedCount} متغير بنجاح`, 'success');
+
+            if (errors.length > 0) {
+                console.error('أخطاء التحديث:', errors);
+                showNotification(`تم تحديث ${updatedCount}/${product.skus.length} متغير (${errors.length} خطأ)`, updatedCount > 0 ? 'success' : 'error');
+            } else {
+                showNotification(`تم تحديث ${updatedCount} متغير بنجاح في سلة`, 'success');
+            }
         } else {
             // منتج بدون متغيرات
             const weight = extractWeight(product) || 0;
@@ -730,6 +843,8 @@ async function updateProductPrice(productId) {
             const profit = subtotal * (savedProfitMargin / 100);
             const finalPrice = Math.round(subtotal + profit);
 
+            console.log(`تحديث المنتج ${productId} بسعر ${finalPrice}...`);
+
             const response = await fetch(`${API_URL}/api/salla/products/${productId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -737,16 +852,30 @@ async function updateProductPrice(productId) {
             });
 
             const result = await response.json();
-            if (result.status === 200 || result.success) {
-                // تحديث السعر محلياً
+            console.log('رد سلة:', result);
+
+            if (response.ok || result.status === 200 || result.success) {
                 product.price = { amount: finalPrice, currency: 'SAR' };
                 saveProductsToStorage();
                 renderProducts();
                 showNotification(`تم تحديث السعر إلى ${finalPrice.toLocaleString('ar-SA')} ر.س`, 'success');
             } else {
-                showNotification('فشل تحديث السعر في سلة', 'error');
+                console.error('فشل التحديث:', result);
+                showNotification(`فشل تحديث السعر: ${result.error?.message || 'خطأ غير معروف'}`, 'error');
             }
         }
+
+        // حفظ في سجل التحديثات
+        const syncHistory = JSON.parse(localStorage.getItem('aura_sync_history') || '[]');
+        syncHistory.unshift({
+            action: 'تحديث سعر',
+            message: `تم تحديث سعر "${product.name}"`,
+            status: 'success',
+            time: new Date().toISOString()
+        });
+        if (syncHistory.length > 20) syncHistory.pop();
+        localStorage.setItem('aura_sync_history', JSON.stringify(syncHistory));
+
     } catch (error) {
         console.error('خطأ في تحديث السعر:', error);
         showNotification('فشل الاتصال بالسيرفر', 'error');

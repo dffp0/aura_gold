@@ -92,6 +92,25 @@ app.get("/api/gold-price", async (req, res) => {
     res.status(500).json({ error: "فشل جلب سعر الذهب" });
   }
 });
+// جلب سعر الفضة (Proxy لتجاوز CORS)
+app.get("/api/silver-price", async (req, res) => {
+  try {
+    const response = await fetch("https://www.goldapi.io/api/XAG/SAR", {
+      method: "GET",
+      headers: {
+        "x-access-token": process.env.GOLD_API_KEY,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("خطأ في جلب سعر الفضة:", error);
+    res.status(500).json({ error: "فشل جلب سعر الفضة" });
+  }
+});
+
 // تحديث سعر منتج في سلة
 app.put("/api/salla/products/:id", async (req, res) => {
   try {

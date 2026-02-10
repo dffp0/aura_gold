@@ -20,25 +20,16 @@ const statsTotal = document.querySelector('.products-stat-card.total .stat-numbe
 // ===== جلب سعر الذهب =====
 async function fetchGoldPrice() {
     try {
-        // استخدام goldapi.io لسعر الذهب
-        const response = await fetch('https://www.goldapi.io/api/XAU/SAR', {
-            method: 'GET',
-            headers: {
-                'x-access-token': 'goldapi-689gsmlftirco-io',
-                'Content-Type': 'application/json'
-            },
-            redirect: 'follow'
-        });
+        // جلب سعر الذهب عبر الباك اند (لتجاوز CORS)
+        const response = await fetch(`${API_URL}/api/gold-price`);
         const data = await response.json();
         if (data.price_gram_24k) {
-            // السعر يأتي مباشرة بالجرام من goldapi.io
             currentGoldPrice = data.price_gram_24k;
             console.log('سعر الذهب عيار 24:', currentGoldPrice.toFixed(2), 'ر.س/جرام');
             localStorage.setItem('aura_gold_price', currentGoldPrice);
             localStorage.setItem('aura_gold_price_time', new Date().toISOString());
             return currentGoldPrice;
         } else if (data.price) {
-            // احتياطي: تحويل سعر الأونصة إلى سعر الجرام
             currentGoldPrice = data.price / 31.1035;
             console.log('سعر الذهب عيار 24:', currentGoldPrice.toFixed(2), 'ر.س/جرام');
             localStorage.setItem('aura_gold_price', currentGoldPrice);
@@ -47,12 +38,11 @@ async function fetchGoldPrice() {
         }
     } catch (error) {
         console.error('خطأ في جلب سعر الذهب:', error);
-        // استخدام السعر المحفوظ
         const savedPrice = localStorage.getItem('aura_gold_price');
         if (savedPrice) {
             currentGoldPrice = parseFloat(savedPrice);
         } else {
-            currentGoldPrice = 338.87; // سعر افتراضي
+            currentGoldPrice = 338.87;
         }
     }
     return currentGoldPrice;
@@ -183,9 +173,9 @@ function renderProducts() {
                 <td><span class="gold-price">${goldPrice ? goldPrice.toLocaleString('ar-SA') + ' ر.س' : '-'}</span></td>
                 <td><span class="final-price">${parseFloat(price).toLocaleString('ar-SA')} ر.س</span></td>
                 <td>
-                    ${product.variants?.length > 0
+                    ${product.skus?.length > 0
                         ? `<button class="btn-variants" onclick="showVariants('${product.id}')">
-                               <span class="variants-count">${product.variants.length}</span>
+                               <span class="variants-count">${product.skus.length}</span>
                                متغيرات
                            </button>`
                         : '<span class="no-variants">-</span>'
@@ -288,27 +278,51 @@ function openEditModal(productId) {
     // حفظ ID المنتج الحالي
     modal.dataset.productId = productId;
 
-    // عرض المتغيرات إن وجدت
+    // عرض المتغيرات (SKUs) إن وجدت
     const variantsSection = document.getElementById('variantsSection');
     const variantsList = document.getElementById('modalVariantsList');
-    if (product.variants && product.variants.length > 0 && variantsSection && variantsList) {
+    if (product.skus && product.skus.length > 0 && variantsSection && variantsList) {
         variantsSection.style.display = 'block';
-        variantsList.innerHTML = product.variants.map((variant, index) => {
-            const variantPrice = variant.price?.amount || variant.price || 0;
-            const variantSku = variant.sku || '-';
-            const variantWeight = variant.weight || extractWeight(variant) || '-';
-            const variantStock = variant.stock_quantity ?? variant.quantity ?? '-';
-            const variantName = variant.name || variant.option_values?.map(v => v.name || v.value).join(' / ') || `متغير ${index + 1}`;
+
+        // بناء خريطة قيم الخيارات لربط الأسماء بالـ SKUs
+        const optionValuesMap = {};
+        if (product.options) {
+            product.options.forEach(option => {
+                if (option.values) {
+                    option.values.forEach(val => {
+                        optionValuesMap[val.id] = { name: val.name, optionName: option.name };
+                    });
+                }
+            });
+        }
+
+        variantsList.innerHTML = product.skus.map((sku, index) => {
+            const skuPrice = sku.price?.amount || 0;
+            const skuSku = sku.sku || '-';
+            const skuWeight = sku.weight || '-';
+            const skuWeightLabel = sku.weight_label || (skuWeight !== '-' ? skuWeight + ' جم' : '-');
+            const skuStock = sku.stock_quantity ?? '-';
+
+            // استخراج اسم المتغير من الخيارات المرتبطة
+            let skuName = '';
+            if (sku.related_option_values && sku.related_option_values.length > 0) {
+                skuName = sku.related_option_values.map(valId => {
+                    const optVal = optionValuesMap[valId];
+                    return optVal ? `${optVal.optionName}: ${optVal.name}` : '';
+                }).filter(Boolean).join(' / ');
+            }
+            if (!skuName) skuName = `متغير ${index + 1}`;
+
             return `
                 <div class="variant-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 8px; margin-bottom: 0.5rem;">
                     <div style="flex: 1;">
-                        <strong style="color: #D4AF37;">${variantName}</strong>
+                        <strong style="color: #D4AF37;">${skuName}</strong>
                         <div style="font-size: 0.8rem; color: #888; margin-top: 4px;">
-                            SKU: ${variantSku} | الوزن: ${variantWeight} | المخزون: ${variantStock}
+                            SKU: ${skuSku} | الوزن: ${skuWeightLabel} | المخزون: ${skuStock}
                         </div>
                     </div>
                     <div style="font-weight: 700; color: #0F3460;">
-                        ${parseFloat(variantPrice).toLocaleString('ar-SA')} ر.س
+                        ${parseFloat(skuPrice).toLocaleString('ar-SA')} ر.س
                     </div>
                 </div>
             `;
@@ -652,16 +666,97 @@ function editProduct(productId) {
 
 // ===== تحديث سعر منتج =====
 async function updateProductPrice(productId) {
+    const product = products.find(p => p.id == productId);
+    if (!product) return;
+
+    const savedCarat = localStorage.getItem(`product_carat_${productId}`);
+    const savedCraftsmanship = parseFloat(localStorage.getItem(`product_craftsmanship_${productId}`)) || 0;
+    const savedAdditionalPrice = parseFloat(localStorage.getItem(`product_additional_${productId}`)) || 0;
+    const savedProfitMargin = parseFloat(localStorage.getItem(`product_profit_${productId}`)) || 0;
+
+    if (!savedCarat) {
+        showNotification('حدد العيار أولاً من تعديل التسعير', 'error');
+        return;
+    }
+
     showNotification('جاري تحديث السعر...', 'info');
-    setTimeout(() => {
-        showNotification('تم تحديث السعر بنجاح', 'success');
-    }, 1500);
+
+    try {
+        // حساب السعر الجديد
+        const basePrice = currentGoldPrice || 338.87;
+        const caratMultipliers = { '24': 1, '22': 0.9167, '21': 0.875, '18': 0.75, '14': 0.583 };
+        const multiplier = caratMultipliers[savedCarat] || 1;
+
+        // إذا المنتج عنده SKUs (متغيرات)، نحدث كل SKU بسعره
+        if (product.skus && product.skus.length > 0) {
+            let updatedCount = 0;
+            for (const sku of product.skus) {
+                const weight = sku.weight || extractWeight(product) || 0;
+                const goldTotal = weight * basePrice * multiplier;
+                const subtotal = goldTotal + savedCraftsmanship + savedAdditionalPrice;
+                const profit = subtotal * (savedProfitMargin / 100);
+                const finalPrice = Math.round(subtotal + profit);
+
+                const response = await fetch(`${API_URL}/api/salla/products/${productId}/skus/${sku.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: finalPrice })
+                });
+
+                const result = await response.json();
+                if (result.status === 200 || result.success) {
+                    updatedCount++;
+                    // تحديث السعر محلياً
+                    sku.price = { amount: finalPrice, currency: 'SAR' };
+                }
+            }
+            // تحديث سعر المنتج الأساسي بسعر أول SKU
+            const firstSkuPrice = product.skus[0].price?.amount || 0;
+            await fetch(`${API_URL}/api/salla/products/${productId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ price: firstSkuPrice })
+            });
+            product.price = { amount: firstSkuPrice, currency: 'SAR' };
+
+            saveProductsToStorage();
+            renderProducts();
+            showNotification(`تم تحديث ${updatedCount} متغير بنجاح`, 'success');
+        } else {
+            // منتج بدون متغيرات
+            const weight = extractWeight(product) || 0;
+            const goldTotal = weight * basePrice * multiplier;
+            const subtotal = goldTotal + savedCraftsmanship + savedAdditionalPrice;
+            const profit = subtotal * (savedProfitMargin / 100);
+            const finalPrice = Math.round(subtotal + profit);
+
+            const response = await fetch(`${API_URL}/api/salla/products/${productId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ price: finalPrice })
+            });
+
+            const result = await response.json();
+            if (result.status === 200 || result.success) {
+                // تحديث السعر محلياً
+                product.price = { amount: finalPrice, currency: 'SAR' };
+                saveProductsToStorage();
+                renderProducts();
+                showNotification(`تم تحديث السعر إلى ${finalPrice.toLocaleString('ar-SA')} ر.س`, 'success');
+            } else {
+                showNotification('فشل تحديث السعر في سلة', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('خطأ في تحديث السعر:', error);
+        showNotification('فشل الاتصال بالسيرفر', 'error');
+    }
 }
 
 // ===== عرض متغيرات المنتج =====
 function showVariants(productId) {
     const product = products.find(p => p.id == productId);
-    if (!product || !product.variants || product.variants.length === 0) return;
+    if (!product || !product.skus || product.skus.length === 0) return;
 
     // فتح مودال التعديل مع إظهار المتغيرات
     openEditModal(productId);

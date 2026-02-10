@@ -74,6 +74,82 @@ app.get("/api/salla/products", async (req, res) => {
   }
 });
 
+// جلب سعر الذهب (Proxy لتجاوز CORS)
+app.get("/api/gold-price", async (req, res) => {
+  try {
+    const response = await fetch("https://www.goldapi.io/api/XAU/SAR", {
+      method: "GET",
+      headers: {
+        "x-access-token": "goldapi-689gsmlftirco-io",
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("خطأ في جلب سعر الذهب:", error);
+    res.status(500).json({ error: "فشل جلب سعر الذهب" });
+  }
+});
+
+// تحديث سعر منتج في سلة
+app.put("/api/salla/products/:id", async (req, res) => {
+  try {
+    if (!process.env.SALLA_ACCESS_TOKEN) {
+      return res.status(401).json({ error: "ما فيه Access Token" });
+    }
+
+    const productId = req.params.id;
+    const response = await fetch(
+      `https://api.salla.dev/admin/v2/products/${productId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${process.env.SALLA_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req.body),
+      }
+    );
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("خطأ في تحديث المنتج:", error);
+    res.status(500).json({ error: "فشل تحديث المنتج في سلة" });
+  }
+});
+
+// تحديث سعر SKU في سلة
+app.put("/api/salla/products/:productId/skus/:skuId", async (req, res) => {
+  try {
+    if (!process.env.SALLA_ACCESS_TOKEN) {
+      return res.status(401).json({ error: "ما فيه Access Token" });
+    }
+
+    const { productId, skuId } = req.params;
+    const response = await fetch(
+      `https://api.salla.dev/admin/v2/products/${productId}/skus/${skuId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${process.env.SALLA_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req.body),
+      }
+    );
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("خطأ في تحديث SKU:", error);
+    res.status(500).json({ error: "فشل تحديث SKU في سلة" });
+  }
+});
+
 // تشغيل السيرفر
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

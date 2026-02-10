@@ -20,11 +20,25 @@ const statsTotal = document.querySelector('.products-stat-card.total .stat-numbe
 // ===== جلب سعر الذهب =====
 async function fetchGoldPrice() {
     try {
-        // استخدام API مجاني لسعر الذهب
-        const response = await fetch('https://api.gold-api.com/price/XAU/SAR');
+        // استخدام goldapi.io لسعر الذهب
+        const response = await fetch('https://www.goldapi.io/api/XAU/SAR', {
+            method: 'GET',
+            headers: {
+                'x-access-token': 'goldapi-689gsmlftirco-io',
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow'
+        });
         const data = await response.json();
-        if (data.price) {
-            // تحويل سعر الأونصة إلى سعر الجرام (1 أونصة = 31.1035 جرام)
+        if (data.price_gram_24k) {
+            // السعر يأتي مباشرة بالجرام من goldapi.io
+            currentGoldPrice = data.price_gram_24k;
+            console.log('سعر الذهب عيار 24:', currentGoldPrice.toFixed(2), 'ر.س/جرام');
+            localStorage.setItem('aura_gold_price', currentGoldPrice);
+            localStorage.setItem('aura_gold_price_time', new Date().toISOString());
+            return currentGoldPrice;
+        } else if (data.price) {
+            // احتياطي: تحويل سعر الأونصة إلى سعر الجرام
             currentGoldPrice = data.price / 31.1035;
             console.log('سعر الذهب عيار 24:', currentGoldPrice.toFixed(2), 'ر.س/جرام');
             localStorage.setItem('aura_gold_price', currentGoldPrice);
@@ -274,11 +288,41 @@ function openEditModal(productId) {
     // حفظ ID المنتج الحالي
     modal.dataset.productId = productId;
 
+    // عرض المتغيرات إن وجدت
+    const variantsSection = document.getElementById('variantsSection');
+    const variantsList = document.getElementById('modalVariantsList');
+    if (product.variants && product.variants.length > 0 && variantsSection && variantsList) {
+        variantsSection.style.display = 'block';
+        variantsList.innerHTML = product.variants.map((variant, index) => {
+            const variantPrice = variant.price?.amount || variant.price || 0;
+            const variantSku = variant.sku || '-';
+            const variantWeight = variant.weight || extractWeight(variant) || '-';
+            const variantStock = variant.stock_quantity ?? variant.quantity ?? '-';
+            const variantName = variant.name || variant.option_values?.map(v => v.name || v.value).join(' / ') || `متغير ${index + 1}`;
+            return `
+                <div class="variant-item" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div style="flex: 1;">
+                        <strong style="color: #D4AF37;">${variantName}</strong>
+                        <div style="font-size: 0.8rem; color: #888; margin-top: 4px;">
+                            SKU: ${variantSku} | الوزن: ${variantWeight} | المخزون: ${variantStock}
+                        </div>
+                    </div>
+                    <div style="font-weight: 700; color: #0F3460;">
+                        ${parseFloat(variantPrice).toLocaleString('ar-SA')} ر.س
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else if (variantsSection) {
+        variantsSection.style.display = 'none';
+    }
+
     // حساب السعر
     updatePriceCalculation();
 
     // إظهار Modal
     modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 // ===== إغلاق Modal =====
@@ -286,6 +330,7 @@ function closeEditModal() {
     const modal = document.getElementById('editProductModal');
     if (modal) {
         modal.classList.remove('active');
+        document.body.style.overflow = '';
     }
 }
 
@@ -616,9 +661,10 @@ async function updateProductPrice(productId) {
 // ===== عرض متغيرات المنتج =====
 function showVariants(productId) {
     const product = products.find(p => p.id == productId);
-    if (product && product.variants) {
-        console.log('Variants:', product.variants);
-    }
+    if (!product || !product.variants || product.variants.length === 0) return;
+
+    // فتح مودال التعديل مع إظهار المتغيرات
+    openEditModal(productId);
 }
 
 // ===== ربط الأحداث =====

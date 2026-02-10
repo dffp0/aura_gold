@@ -80,10 +80,9 @@ app.get("/api/gold-price", async (req, res) => {
     const response = await fetch("https://www.goldapi.io/api/XAU/SAR", {
       method: "GET",
       headers: {
-        "x-access-token": "goldapi-689gsmlftirco-io",
+        "x-access-token": process.env.GOLD_API_KEY,
         "Content-Type": "application/json",
       },
-      redirect: "follow",
     });
 
     const data = await response.json();
@@ -93,7 +92,6 @@ app.get("/api/gold-price", async (req, res) => {
     res.status(500).json({ error: "فشل جلب سعر الذهب" });
   }
 });
-
 // تحديث سعر منتج في سلة
 app.put("/api/salla/products/:id", async (req, res) => {
   try {
